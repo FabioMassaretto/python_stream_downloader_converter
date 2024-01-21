@@ -9,8 +9,9 @@ queue_path = base_path + "queue/"
 queue_video_path = queue_path + "video/"
 destination_video_path = base_path + "downloaded/video/"
 destination_converted_audio_path = base_path + "converted/audio/"
-dir_files_list = None
+dir_permitted_files_list = list()
 video_file_dict = {}
+permitted_file_type = ('.mp4', '.mkv')
 
 
 def progress_func(stream, data_chunck, bytes_remaining):
@@ -36,6 +37,7 @@ def complete_func(stream, file_path):
 def download(link):
     youtubeObject = YouTube(link, on_progress_callback=progress_func, on_complete_callback=complete_func)
     youtubeObject = youtubeObject.streams.get_highest_resolution()
+
     try:
         youtubeObject.download(output_path=destination_video_path)
     except Exception as e:
@@ -51,29 +53,39 @@ def move_to_queue_dir(file_path):
     full_dest_path = queue_video_path + full_filename
 
     try:
-        shutil.copyfile(full_src_path, full_dest_path)
+        shutil.copy2(full_src_path, full_dest_path)
         print(f"\nVideo: {full_filename} added to the queue.")
     except Exception as ex:
         print(ex)
 
+def only_permited_video_files():
+    dir_files_list = os.listdir(queue_video_path)
+    
+    for file in dir_files_list:
+        filename_index = str(file).index(".")
+        format_type = file[filename_index:]
+
+        if format_type in permitted_file_type:
+            dir_permitted_files_list.append(file)
+
 
 def list_dir_files():
-    # print(dir_files_list)
-    # print(video_file_dict)
-    dir_files_list = os.listdir(queue_video_path)
-    if len(dir_files_list) <= 0:
-        print(f"Directory {queue_video_path} with no file to convert, put video file in it or dwonload a Youtube video first.")
+    only_permited_video_files()
+
+    if len(dir_permitted_files_list) <= 0:
+        print(f"Directory {queue_video_path} with no file to convert, put video file in it or download a Youtube video first.")
         return -1
     
     print("all - To convert ALL files")
     print("back - Go back to main menu")
-    for i, item in enumerate(dir_files_list):
+    for i, item in enumerate(dir_permitted_files_list):
         print(f"{i} - {item}")
         video_file_dict[i] = item
 
 
 def process_convertion_audio():
     correct_option = False
+    is_multi_file = False
 
     if list_dir_files() == -1:
         return
@@ -81,9 +93,7 @@ def process_convertion_audio():
     chose_option = input("\nEnter the number corresponding to the file (or all or back): ")
 
     if chose_option.isdigit():
-
         if int(chose_option) >= len(video_file_dict):
-
             while not correct_option:
                 chose_option = input("Incorrect option, choose a valid option: ")
 
@@ -97,7 +107,7 @@ def process_convertion_audio():
             file = video_file_dict.get(i)
             print(f"Converting: {file}...")
             convert_to_audio(queue_video_path, destination_converted_audio_path, file)
-            #AudioSegment.from_file(destination_video_path + item).export(destination_converted_audio_path + item + ".mp3", format="mp3")
+            is_multi_file = True
     elif not chose_option.isdigit():
         print("\nERROR: Not a valid option!")
         return
@@ -108,18 +118,22 @@ def process_convertion_audio():
         print(f"Converting: {filename}...")
         convert_to_audio(queue_video_path, destination_converted_audio_path, filename)
 
+    quantity_converted = str(len(video_file_dict)) + " file(s)" if is_multi_file else "1 file"
+    print(f"\nSUCCESS! It was converted {quantity_converted}.")
 
 def convert_to_audio(from_file_path, dest_path, filename, format_type="mp3"):
     format_type_index = str(filename).index('.')
     new_filename_without_type = filename[:format_type_index]
 
+    full_dest_file_path = dest_path + new_filename_without_type
+    full_from_file_path = from_file_path + filename
+
     try:
-        AudioSegment.from_file(from_file_path + filename).export(dest_path + new_filename_without_type, format=format_type)
-        os.remove(from_file_path + filename)
+        AudioSegment.from_file(full_from_file_path).export(full_dest_file_path, format=format_type)
+        os.remove(full_from_file_path)
     except FileNotFoundError:
         print("The file was not found")
         
-
 
 def menu_select(main_menu_option):
     match main_menu_option:
