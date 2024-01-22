@@ -9,34 +9,33 @@ from Helpers.Utils.DirectoryUtils import DirectoryUtils
 queue_video_path = ApplicationVariables["QUEUE_VIDEO_PATH"].value
 dest_converted_audio_path = ApplicationVariables["DEST_CONVERTED_AUDIO_PATH"].value
 
-refactor_permitted_files_dic = dict()
 permitted_file_extension = ApplicationVariables["PERMITTED_FILE_EXTENSIONS"].value
+permitted_video_files_dic = dict()
 
-def refactor_only_permitted_video_files():
-    refactor_permitted_files_dic.clear()
+def populate_dict_permitted_video_files():
+    permitted_video_files_dic.clear()
     files_in_queue_folder = os.listdir(queue_video_path)
 
     for file in files_in_queue_folder:
         extension_period_index = str(file).index(".")
         file_extension = file[extension_period_index:]
 
-        if file_extension in permitted_file_extension and file not in refactor_permitted_files_dic:
-            index = len(refactor_permitted_files_dic)
+        if file_extension in permitted_file_extension and file not in permitted_video_files_dic:
+            index = len(permitted_video_files_dic)
             new_item_dict = {index: file}
-            refactor_permitted_files_dic.update(new_item_dict)
+            permitted_video_files_dic.update(new_item_dict)
 
 
-def refactor_list_dir_files():
-    refactor_only_permitted_video_files()
+def mount_menu_for_videos_to_convert():
+    populate_dict_permitted_video_files()
 
-    if len(refactor_permitted_files_dic) <= 0:
-        print(f"Directory {queue_video_path} with no file to convert, put video file in it or download a Youtube video first.")
-        return -1
-    
+    if len(permitted_video_files_dic) <= 0:
+        raise ValueError(f"Directory {queue_video_path} with no file to convert, put video file in it or download a Youtube video first.")
+  
     print("all - To convert ALL files")
     print("back - Go back to main menu")
-    for i in refactor_permitted_files_dic:
-        print(f"{i} - {refactor_permitted_files_dic.get(i)}")
+    for i in permitted_video_files_dic:
+        print(f"{i} - {permitted_video_files_dic.get(i)}")
 
 
 def process_convertion_audio():
@@ -44,24 +43,27 @@ def process_convertion_audio():
     is_converted_success = False
     quantity_converted = 0
 
-    if refactor_list_dir_files() == -1:
+    try:
+        mount_menu_for_videos_to_convert()
+    except ValueError as verr:
+        print(verr)
         return
-    
+        
     chose_option = input("\nEnter the number corresponding to the file (or all or back): ")
 
     if chose_option.isdigit():
-        if int(chose_option) >= len(refactor_permitted_files_dic):
+        if int(chose_option) >= len(permitted_video_files_dic):
             while not correct_option:
                 chose_option = input("Incorrect option, choose a valid option: ")
 
-                if int(chose_option) < len(refactor_permitted_files_dic):
+                if int(chose_option) < len(permitted_video_files_dic):
                     correct_option = True
 
     if chose_option == "all".lower():
         print("Converting all file: ")
-        print(refactor_permitted_files_dic)
+        print(permitted_video_files_dic)
 
-        for index in refactor_permitted_files_dic:
+        for index in permitted_video_files_dic:
             is_converted_success = convert_to_audio_succesfully(queue_video_path, dest_converted_audio_path, index)
             quantity_converted += 1
     elif chose_option == "back".lower():
@@ -79,7 +81,7 @@ def process_convertion_audio():
 
     
 def convert_to_audio_succesfully(from_file_path, dest_path, index, format_type="mp3"):
-    file = refactor_permitted_files_dic.get(index)
+    file = permitted_video_files_dic.get(index)
 
     extension_period_index = str(file).index('.')
     new_filename_without_extension = file[:extension_period_index]
