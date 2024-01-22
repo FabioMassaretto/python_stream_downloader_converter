@@ -11,8 +11,6 @@ class YoutubeProvider:
         youtubeObject = youtubeObject.streams.get_highest_resolution()
 
         try:
-            print("DEBUG")
-            print(self.__dest_downloaded_video_path__)
             youtubeObject.download(output_path=self.__dest_downloaded_video_path__)
         except Exception as e:
             print("An error has occurred")

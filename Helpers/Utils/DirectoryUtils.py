@@ -6,7 +6,7 @@ queue_video_path = ApplicationVariables["QUEUE_VIDEO_PATH"].value
 dest_downloaded_video_path = ApplicationVariables["DEST_DOWNLOADED_VIDEO_PATH"].value
 dest_converted_audio_path = ApplicationVariables["DEST_CONVERTED_AUDIO_PATH"].value
 
-class Directory:
+class DirectoryUtils:
     def create_folders():
         if not os.path.exists(queue_video_path):
             os.makedirs(queue_video_path)
