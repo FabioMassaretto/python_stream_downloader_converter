@@ -4,7 +4,7 @@ from Helpers.Utils.FileMover import FileMover
 
 
 class YoutubeProvider:
-    dest_downloaded_video_path = ApplicationVariables["DEST_DOWNLOADED_VIDEO_PATH"].value
+    __dest_downloaded_video_path__ = ApplicationVariables["DEST_DOWNLOADED_VIDEO_PATH"].value
         
     def download(self, link):
         youtubeObject = YouTube(link, on_progress_callback=self.__progress_func__, on_complete_callback=self.__complete_func__)
@@ -12,8 +12,8 @@ class YoutubeProvider:
 
         try:
             print("DEBUG")
-            print(self.dest_downloaded_video_path)
-            youtubeObject.download(output_path=self.dest_downloaded_video_path)
+            print(self.__dest_downloaded_video_path__)
+            youtubeObject.download(output_path=self.__dest_downloaded_video_path__)
         except Exception as e:
             print("An error has occurred")
             print(e)
@@ -26,7 +26,7 @@ class YoutubeProvider:
 
 
     def __complete_func__(self, stream, file_path):
-        print(f"\nDownload is completed successfully and moved to {self.dest_downloaded_video_path}", end="\n\n")
+        print(f"\nDownload is completed successfully and moved to {self.__dest_downloaded_video_path__}", end="\n\n")
 
         convert_answer = input("Do you want to queue this video for convertion? (yes(y) or no(n)): ")
         while convert_answer not in ("yes", "y", "no", "n"):

@@ -11,17 +11,17 @@ dest_converted_audio_path = ApplicationVariables["DEST_CONVERTED_AUDIO_PATH"].va
 
 dir_permitted_files_list = list()
 video_file_dict = {}
-permitted_file_type = ('.mp4', '.mkv')
+permitted_file_extension = ('.mp4', '.mkv')
 
 
 def only_permited_video_files():
-    dir_files_list = os.listdir(queue_video_path)
+    dir_queue_files_list = os.listdir(queue_video_path)
     
-    for file in dir_files_list:
-        filename_index = str(file).index(".")
-        format_type = file[filename_index:]
+    for file in dir_queue_files_list:
+        extension_period_index = str(file).index(".")
+        file_extension = file[extension_period_index:]
 
-        if format_type in permitted_file_type:
+        if file_extension in permitted_file_extension:
             dir_permitted_files_list.append(file)
 
 
@@ -78,10 +78,10 @@ def process_convertion_audio():
     print(f"\nSUCCESS! It was converted {quantity_converted} file(s).")
 
 def convert_to_audio(from_file_path, dest_path, filename, format_type="mp3"):
-    format_type_index = str(filename).index('.')
-    new_filename_without_type = filename[:format_type_index]
+    extension_period_index = str(filename).index('.')
+    new_filename_without_extension = filename[:extension_period_index]
 
-    full_dest_file_path = dest_path + new_filename_without_type
+    full_dest_file_path = dest_path + new_filename_without_extension
     full_from_file_path = from_file_path + filename
 
     try:
