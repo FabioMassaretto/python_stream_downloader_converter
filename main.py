@@ -1,125 +1,72 @@
-
-import os
-from pydub import AudioSegment
+from Helpers.ConverterFactory import ConverterFactory
 from Helpers.DownloaderFactory import DownloaderFactory
 from Helpers.Utils.ApplicationVariables import ApplicationVariables
+from Helpers.Utils.CollectionsUtils import CollectionsUtils
 from Helpers.Utils.DirectoryUtils import DirectoryUtils
 
-# TODO: To be removed after refactor
 queue_video_path = ApplicationVariables["QUEUE_VIDEO_PATH"].value
-dest_converted_audio_path = ApplicationVariables["DEST_CONVERTED_AUDIO_PATH"].value
 
-permitted_file_extension = ApplicationVariables["PERMITTED_FILE_EXTENSIONS"].value
-permitted_video_files_dic = dict()
-
-def populate_dict_permitted_video_files():
-    permitted_video_files_dic.clear()
-    files_in_queue_folder = os.listdir(queue_video_path)
-
-    for file in files_in_queue_folder:
-        extension_period_index = str(file).index(".")
-        file_extension = file[extension_period_index:]
-
-        if file_extension in permitted_file_extension and file not in permitted_video_files_dic:
-            index = len(permitted_video_files_dic)
-            new_item_dict = {index: file}
-            permitted_video_files_dic.update(new_item_dict)
+collections_utils = CollectionsUtils()
 
 
-def mount_menu_for_videos_to_convert():
-    populate_dict_permitted_video_files()
-
-    if len(permitted_video_files_dic) <= 0:
-        raise ValueError(f"Directory {queue_video_path} with no file to convert, put video file in it or download a Youtube video first.")
-  
-    print("all - To convert ALL files")
-    print("back - Go back to main menu")
-    for i in permitted_video_files_dic:
-        print(f"{i} - {permitted_video_files_dic.get(i)}")
-
-
-def is_valid_option_chose(chose_option):
-    if chose_option.isdigit():
-        if int(chose_option) >= len(permitted_video_files_dic):
-            return True
+def is_valid_option_chose(option_chose, dict_size):
+    if (option_chose.isdigit() and int(option_chose) < dict_size) or option_chose in ('all', 'back'):
+        return True
         
     return False
 
-def process_convertion_audio():
-    correct_option = False
-    is_converted_success = True
-    quantity_converted = 0
 
-    try:
-        mount_menu_for_videos_to_convert()
-    except ValueError as verr:
-        print(verr)
-        return
-        
-    chose_option = input("\nEnter the number corresponding to the file (or all or back): ")
+def validate_return_user_input_choose(dict_size):
+    option_chose = input("\nEnter the number corresponding to the file (or all or back): ")
+    valid_option = is_valid_option_chose(option_chose, dict_size)
 
-    if is_valid_option_chose(chose_option):
-        while not correct_option:
-            chose_option = input("Incorrect option, choose a valid option: ")
+    while not valid_option:
+        option_chose = input("Incorrect option, choose a valid option: ")
 
-            if int(chose_option) < len(permitted_video_files_dic):
-                correct_option = True
+        if (is_valid_option_chose(option_chose, dict_size)):
+            valid_option = True
 
-    if chose_option == "all".lower():
-        print("Converting all file: ")
-        print(permitted_video_files_dic)
-
-        for index in permitted_video_files_dic:
-            is_converted_success = convert_to_audio_succesfully(queue_video_path, dest_converted_audio_path, index)
-            quantity_converted += 1
-    elif chose_option == "back".lower():
-        return
-    elif chose_option.isdigit():
-        index = int(chose_option)
-        is_converted_success = convert_to_audio_succesfully(queue_video_path, dest_converted_audio_path, index)
-        quantity_converted += 1
-    else:
-        print("\nERROR: Not a valid option!")
-        return
+    return option_chose
     
-    if is_converted_success:
-        print(f"\nSUCCESS! It was converted {quantity_converted} file{'s' if quantity_converted > 1 else ''}.")
+def load_permitted_video_files_dic():
+    permitted_video_files_dic = {}
+    permitted_video_files_dic = collections_utils.populate_dict_permitted_video_files()
+    total_permitted_video_files_dic = len(permitted_video_files_dic)
 
-    
-def convert_to_audio_succesfully(from_file_path, dest_path, index, format_type="mp3"):
-    file = permitted_video_files_dic.get(index)
+    return (permitted_video_files_dic, total_permitted_video_files_dic)
 
-    extension_period_index = str(file).index('.')
-    new_filename_without_extension = file[:extension_period_index]
 
-    full_dest_file_path = dest_path + new_filename_without_extension
-    full_from_file_path = from_file_path + file
-    
-    print(f"Converting: {file}...")
+def mount_menu_for_videos_to_convert(permitted_video_files_values, total):
+    if total <= 0:
+        raise IndexError(f"Directory {queue_video_path} has no file to convert, put video file in it or download a video first.")
 
-    try:
-        AudioSegment.from_file(full_from_file_path).export(full_dest_file_path, format=format_type)
-        print(full_from_file_path)
-        os.remove(full_from_file_path)      
-    except FileNotFoundError:
-        print("\nERROR: The file was not found")
+    print("all - To convert ALL files")
+    print("back - Go back to main menu")
+    for i in permitted_video_files_values:
+        print(f"{i} - {permitted_video_files_values.get(i)}")
 
-        return False
-    except:
-        return False
-        
 
 def menu_select(main_menu_option):
     downloader_factory = DownloaderFactory()
+    converter_factory = ConverterFactory()
 
     match main_menu_option:
         case 1:
             print(" Chose => Download a Youtube video \n")
             link = input("Enter the YouTube video URL: ")
-            downloader_factory.download('YOUTUBE', link)
+            youtube_downloader = downloader_factory.create('YOUTUBE')
+            youtube_downloader.download(link)
         case 2:
             print(" Chose => Convert a Youtube video to audio file \n")
-            process_convertion_audio()
+            files_to_convert, total_files = load_permitted_video_files_dic()
+            pydub_converter = converter_factory.create('PYDUB')
+            try:
+                mount_menu_for_videos_to_convert(files_to_convert, total_files)
+                option_chose = validate_return_user_input_choose(total_files)
+                pydub_converter.process_convert_to_audio(option_chose, files_to_convert)
+            except IndexError as ierr:
+                print(ierr)
+                return
 
 
 def display_menu():
