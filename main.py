@@ -118,8 +118,8 @@ def process_convertion_audio():
         print(f"Converting: {filename}...")
         convert_to_audio(queue_video_path, destination_converted_audio_path, filename)
 
-    quantity_converted = str(len(video_file_dict)) + " file(s)" if is_multi_file else "1 file"
-    print(f"\nSUCCESS! It was converted {quantity_converted}.")
+    quantity_converted = str(len(video_file_dict)) if is_multi_file else "1"
+    print(f"\nSUCCESS! It was converted {quantity_converted} file(s).")
 
 def convert_to_audio(from_file_path, dest_path, filename, format_type="mp3"):
     format_type_index = str(filename).index('.')
@@ -174,7 +174,18 @@ def menu():
     print("Program finnished")
     return
 
+def create_folders():
+    if not os.path.exists(queue_video_path):
+        os.makedirs(queue_video_path)
+    
+    if not os.path.exists(destination_video_path):
+        os.makedirs(destination_video_path)
+    
+    if not os.path.exists(destination_converted_audio_path):
+        os.makedirs(destination_converted_audio_path)
+
 
 if __name__ == "__main__":
     print("\n\n------------------------- YOUTUBE DOWNLOADER AND CONVERTER -------------------------")
+    create_folders()
     menu()
