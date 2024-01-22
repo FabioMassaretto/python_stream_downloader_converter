@@ -38,9 +38,16 @@ def mount_menu_for_videos_to_convert():
         print(f"{i} - {permitted_video_files_dic.get(i)}")
 
 
+def is_valid_option_chose(chose_option):
+    if chose_option.isdigit():
+        if int(chose_option) >= len(permitted_video_files_dic):
+            return True
+        
+    return False
+
 def process_convertion_audio():
     correct_option = False
-    is_converted_success = False
+    is_converted_success = True
     quantity_converted = 0
 
     try:
@@ -51,13 +58,12 @@ def process_convertion_audio():
         
     chose_option = input("\nEnter the number corresponding to the file (or all or back): ")
 
-    if chose_option.isdigit():
-        if int(chose_option) >= len(permitted_video_files_dic):
-            while not correct_option:
-                chose_option = input("Incorrect option, choose a valid option: ")
+    if is_valid_option_chose(chose_option):
+        while not correct_option:
+            chose_option = input("Incorrect option, choose a valid option: ")
 
-                if int(chose_option) < len(permitted_video_files_dic):
-                    correct_option = True
+            if int(chose_option) < len(permitted_video_files_dic):
+                correct_option = True
 
     if chose_option == "all".lower():
         print("Converting all file: ")
@@ -94,9 +100,7 @@ def convert_to_audio_succesfully(from_file_path, dest_path, index, format_type="
     try:
         AudioSegment.from_file(full_from_file_path).export(full_dest_file_path, format=format_type)
         print(full_from_file_path)
-        os.remove(full_from_file_path)
-
-        return True        
+        os.remove(full_from_file_path)      
     except FileNotFoundError:
         print("\nERROR: The file was not found")
 
