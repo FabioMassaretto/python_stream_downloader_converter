@@ -18,5 +18,9 @@ class SavifyProvider:
         path_holder = PathHolder(downloads_path=self.dest_converted_audio_path)
         api_credentials = (CLIENT_ID, CLIENT_SECRET)
 
+        print(f"\n\nWARNING: This is an experimental feature.")
+        print(f"WARNING: This can take some second/minutes to finish.")
+        print(f"INFO: You have to set client_id and client_secret credentials environment for spotify developer https://developer.spotify.com/.")
+
         s = Savify(api_credentials=api_credentials, path_holder=path_holder, logger=logging)
         s.download(url)
