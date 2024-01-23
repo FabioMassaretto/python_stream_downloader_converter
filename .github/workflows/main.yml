@@ -34,11 +34,6 @@ jobs:
 
       - name: Setup variables
         id: setup_variables
-        env:
-          source_repo: ${{ steps.process_inputs.outputs.source_repo }}
-          source_tag: ${{ steps.process_inputs.outputs.source_tag }}
-          target_repo: ${{ steps.process_inputs.outputs.target_repo }}
-          target_tag: ${{ steps.process_inputs.outputs.target_tag }}
         run: |
           # unholy bash monstrosity (sincere apologies)
           fallback_token () {
@@ -64,7 +59,7 @@ jobs:
           revision="${{ (!vars.PUSH_VERSION_COMMIT) && '$(date -u +"%H%M%S")' || '' }}"
           version="$(
             python devscripts/update-version.py \
-            -c "${resolved_source}" -r "${{ github.repository }}" ${{ inputs.version || '$revision' }} | \
+            -c "${resolved_source}" -r "${{ github.repository }}" ${{ '$revision' }} | \
             grep -Po "version=\K\d+\.\d+\.\d+(\.\d+)?")"
           if [[ "${target_repo}" ]]; then
             if [[ -z "${target_tag}" ]]; then
@@ -94,7 +89,7 @@ jobs:
               target_repo='${{ github.repository }}'
             fi
           fi
-          if [[ "${target_repo}" == '${{ github.repository }}' ]] && ${{ !inputs.prerelease }}; then
+          if [[ "${target_repo}" == '${{ github.repository }}' ]]; then
             pypi_project='${{ vars.PYPI_PROJECT }}'
           fi
           echo "::group::Output variables"
@@ -114,7 +109,7 @@ jobs:
           version: ${{ steps.setup_variables.outputs.version }}
           target_repo: ${{ steps.setup_variables.outputs.target_repo }}
         if: |
-          !inputs.prerelease && env.target_repo == github.repository
+          env.target_repo == github.repository
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -130,7 +125,7 @@ jobs:
         env:
           target_repo: ${{ steps.setup_variables.outputs.target_repo }}
         if: |
-          vars.PUSH_VERSION_COMMIT != '' && !inputs.prerelease && env.target_repo == github.repository
+          vars.PUSH_VERSION_COMMIT != '' && env.target_repo == github.repository
         run: git push origin ${{ github.event.ref }}
 
   build:
@@ -237,7 +232,7 @@ jobs:
           version: ${{ needs.prepare.outputs.version }}
           channel: ${{ needs.prepare.outputs.channel }}
         if: |
-          inputs.prerelease && env.GH_TOKEN != '' && env.GH_REPO != '' && env.GH_REPO != github.repository
+          env.GH_TOKEN != '' && env.GH_REPO != '' && env.GH_REPO != github.repository
         run: |
           title="${{ startswith(env.GH_REPO, 'yt-dlp/') && 'yt-dlp ' || '' }}${{ env.channel }}"
           gh release create \
@@ -270,9 +265,9 @@ jobs:
           title="${{ github.repository == 'yt-dlp/yt-dlp' && 'yt-dlp ' || '' }}"
           title+="${{ env.target_tag != env.version && format('{0} ', env.target_tag) || '' }}"
           gh release create \
-            --notes-file ${{ inputs.prerelease && 'PRERELEASE_NOTES' || 'RELEASE_NOTES' }} \
+            --notes-file ${{ 'PRERELEASE_NOTES' || 'RELEASE_NOTES' }} \
             --target ${{ env.head_sha }} \
             --title "${title}${{ env.version }}" \
-            ${{ inputs.prerelease && '--prerelease' || '' }} \
+            ${{ '--prerelease' || '' }} \
             ${{ env.target_tag }} \
             artifact/*
