@@ -40,6 +40,7 @@ jobs:
             python devscripts/update-version.py \
             -c "${resolved_source}" -r "${{ github.repository }}" ${{ '$revision' }} | \
             grep -Po "version=\K\d+\.\d+\.\d+(\.\d+)?")"
+          python devscripts/update-version.py -c "${{ env.channel }}" -r "${{ env.target_repo }}" -s "${{ env.suffix }}" "${{ env.version }}"
 
   publish_pypi:
     needs: [prepare]
