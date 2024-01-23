@@ -3,8 +3,8 @@ from Helpers.Utils.ApplicationVariables import ApplicationVariables
 
 
 class CollectionsUtils:
-    queue_video_path = ApplicationVariables["QUEUE_VIDEO_PATH"].value
-    permitted_file_extension = ApplicationVariables["PERMITTED_FILE_EXTENSIONS"].value
+    queue_video_path = ApplicationVariables().get("QUEUE_VIDEO_PATH")
+    permitted_file_extension = ApplicationVariables().get("PERMITTED_FILE_EXTENSIONS")
 
     permitted_video_files_dic = dict()
     

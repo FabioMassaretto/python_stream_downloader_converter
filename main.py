@@ -4,7 +4,7 @@ from Helpers.Utils.ApplicationVariables import ApplicationVariables
 from Helpers.Utils.CollectionsUtils import CollectionsUtils
 from Helpers.Utils.DirectoryUtils import DirectoryUtils
 
-queue_video_path = ApplicationVariables["QUEUE_VIDEO_PATH"].value
+queue_video_path = ApplicationVariables().get("QUEUE_VIDEO_PATH")
 
 collections_utils = CollectionsUtils()
 

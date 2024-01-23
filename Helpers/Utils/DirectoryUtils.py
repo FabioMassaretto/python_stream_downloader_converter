@@ -2,9 +2,9 @@ import os
 
 from Helpers.Utils.ApplicationVariables import ApplicationVariables
 
-queue_video_path = ApplicationVariables["QUEUE_VIDEO_PATH"].value
-dest_downloaded_video_path = ApplicationVariables["DEST_DOWNLOADED_VIDEO_PATH"].value
-dest_converted_audio_path = ApplicationVariables["DEST_CONVERTED_AUDIO_PATH"].value
+queue_video_path = ApplicationVariables().get("QUEUE_VIDEO_PATH")
+dest_downloaded_video_path = ApplicationVariables().get("DEST_DOWNLOADED_VIDEO_PATH")
+dest_converted_audio_path = ApplicationVariables().get("DEST_CONVERTED_AUDIO_PATH")
 
 class DirectoryUtils:
     def create_folders():

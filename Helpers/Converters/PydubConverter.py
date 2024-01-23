@@ -1,11 +1,14 @@
 import os
 from pydub import AudioSegment
+
 from Helpers.Utils.ApplicationVariables import ApplicationVariables
 
 
 class PydubConverter:  
-    dest_converted_audio_path = ApplicationVariables["DEST_CONVERTED_AUDIO_PATH"].value
-    queue_video_path = ApplicationVariables["QUEUE_VIDEO_PATH"].value
+    dest_converted_audio_path = ApplicationVariables().get("DEST_CONVERTED_AUDIO_PATH")
+    # dest_converted_audio_path = ApplicationVariables["DEST_CONVERTED_AUDIO_PATH"].value
+    queue_video_path = ApplicationVariables().get("QUEUE_VIDEO_PATH")
+    # queue_video_path = ApplicationVariables["QUEUE_VIDEO_PATH"].value
     quantity_converted = 0
     
     def process_convert_to_audio(self, user_option, video_files_dic):

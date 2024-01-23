@@ -1,11 +1,10 @@
-from enum import Enum
+
+from Helpers.Utils.ApplicationEnums import ApplicationEnums
 
 
-class ApplicationVariables(Enum):
-    BASE_PATH="./"
-    BASE_MEDIA_PATH="media/"
-    QUEUE_BASE_PATH=f"{BASE_MEDIA_PATH}queue/"
-    QUEUE_VIDEO_PATH=f"{QUEUE_BASE_PATH}video/"
-    DEST_DOWNLOADED_VIDEO_PATH=f"{BASE_MEDIA_PATH}downloaded/video/"
-    DEST_CONVERTED_AUDIO_PATH=f"{BASE_MEDIA_PATH}converted/audio/"
-    PERMITTED_FILE_EXTENSIONS=['.mp4', '.mkv']
+class ApplicationVariables:
+    def __init__(self) -> None:
+        self.path_enums = ApplicationEnums
+
+    def get(self, key):
+        return self.path_enums[key].value

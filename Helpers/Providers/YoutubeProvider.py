@@ -4,7 +4,7 @@ from Helpers.Utils.FileMover import FileMover
 
 
 class YoutubeProvider:
-    __dest_downloaded_video_path__ = ApplicationVariables["DEST_DOWNLOADED_VIDEO_PATH"].value
+    __dest_downloaded_video_path__ = ApplicationVariables().get("DEST_DOWNLOADED_VIDEO_PATH")
         
     def download(self, link):
         youtubeObject = YouTube(link, on_progress_callback=self.__progress_func__, on_complete_callback=self.__complete_func__)
