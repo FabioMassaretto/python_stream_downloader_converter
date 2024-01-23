@@ -20,7 +20,8 @@ jobs:
     - name: switching from HTTPS to SSH
       run: git remote set-url origin ${{ env.SSH }}
     - name: set up user name and email
-      run: git config --global user.email "fmassaretto@outlook.com"
+      run: |
+        git config --global user.email "fmassaretto@outlook.com"
         git config --global user.name "Fabio Massaretto"
     - name: check for changes
       run: git status
