@@ -10,17 +10,19 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      SSH: 'git@github.com:FabioMassaretto/python_stream_downloader_converter.git'
     
     steps:
     - uses: actions/checkout@v1
     - name: Run a one-line script
       run: python ./.github/workflows/update_version.py
-    # - name: switching from HTTPS to SSH
-    #   run: git remote set-url origin ${{ secrets.ssh }}
-    - name: set up user email
-      run: git config --global user.email "fmassaretto@outlook.com"
-    - name: set up user name
-      run: git config --global user.name "Fabio Massaretto"
+    - name: switching from HTTPS to SSH
+      run: git remote set-url origin ${{ env.SSH }}
+    # - name: set up user email
+    #   run: git config --global user.email "fmassaretto@outlook.com"
+    # - name: set up user name
+    #   run: git config --global user.name "Fabio Massaretto"
     - name: check for changes
       run: git status
     - name: stage changed files
