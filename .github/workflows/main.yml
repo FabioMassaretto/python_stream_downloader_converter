@@ -18,4 +18,4 @@ jobs:
       - name: Get Git Version
         uses: docker://gittools/gitversion:5.8.2-ubuntu.20.04-6.0-amd64
         with:
-          args: /github/workspace /nofetch /bin/sh /execargs "-c \"echo $GitVersion_MajorMinorPatch > /github/workspace/version.txt\""
+          args: /github/workspace /nofetch /execargs "-c \"echo $GitVersion_MajorMinorPatch > /github/workspace/version.txt\""
