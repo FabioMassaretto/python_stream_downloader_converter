@@ -1,7 +1,8 @@
 name: Build
 on: workflow_call
+
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   prepare:
