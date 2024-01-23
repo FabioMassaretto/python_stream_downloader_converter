@@ -24,31 +24,3 @@ jobs:
           git add -A
           git commit -m "Automatic version updated"
           git push
-# jobs:
-#   build:
-#     runs-on: ubuntu-latest
-#     env:
-#       SSH: 'git@github.com:FabioMassaretto/python_stream_downloader_converter.git'
-    
-#     steps:
-#     - uses: actions/checkout@v1
-#     - name: Run a one-line script
-#       run: python ./.github/workflows/update_version.py
-#     - name: switching from HTTPS to SSH
-#       run: git remote set-url origin ${{ env.SSH }}
-#     - name: test SSH 
-#       run: ssh -T git@github.com
-#     - name: set up user email
-#       run: git config --global user.email "fmassaretto@outlook.com"
-#     - name: set up user name
-#       run: git config --global user.name "Fabio Massaretto"
-#     - name: check for changes
-#       run: git status
-#     - name: stage changed files
-#       run: git add .
-#     - name: commit changed files
-#       run: git commit -m "Auto updating version.txt"
-#     - name: fetch from main
-#       run: git fetch origin main
-#     - name: push code to master
-#       run: git push origin HEAD:main
