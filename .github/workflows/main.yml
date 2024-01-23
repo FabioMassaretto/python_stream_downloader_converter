@@ -132,9 +132,9 @@ jobs:
     needs: prepare
     uses: ./.github/workflows/build.yml
     with:
-      version: ${{ needs.prepare.outputs.version }}
-      channel: ${{ needs.prepare.outputs.channel }}
-      origin: ${{ needs.prepare.outputs.target_repo }}
+      version: ${{ steps.setup_variables.outputs.version }}
+      channel: ${{ steps.setup_variables.outputs.channel }}
+      origin: ${{ steps.setup_variables.outputs.target_repo }}
     permissions:
       contents: read
       packages: write # For package cache
