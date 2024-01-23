@@ -46,7 +46,7 @@ class PydubConverter:
         print(f"Converting: {file}...")
 
         try:
-            AudioSegment.from_file(full_from_file_path).export(full_dest_file_path, format=format_type)
+            AudioSegment.from_file(full_from_file_path).export(full_dest_file_path  + "." + format_type, format=format_type)
             print(full_from_file_path)
             os.remove(full_from_file_path)
             self.quantity_converted += 1
