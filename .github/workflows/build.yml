@@ -1,0 +1,69 @@
+name: Build
+on: workflow_dispatch
+permissions:
+  contents: read
+
+jobs:
+  prepare:
+    permissions:
+      contents: write  # for push_release
+    runs-on: ubuntu-latest
+    outputs:
+      version_suffix: ${{ steps.version_suffix.outputs.version_suffix }}
+      app_version: ${{ steps.bump_version.outputs.app_version }}
+      head_sha: ${{ steps.push_release.outputs.head_sha }}
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - uses: actions/setup-python@v4
+      with:
+          python-version: '3.11'
+
+    - name: Set version suffix
+      id: version_suffix
+      env:
+        PUSH_VERSION_COMMIT: ${{ secrets.PUSH_VERSION_COMMIT }}
+      if: "env.PUSH_VERSION_COMMIT == ''"
+      run: echo "version_suffix=$(date -u +"%H%M%S")" >> "$GITHUB_OUTPUT"
+    - name: Bump version
+      id: bump_version
+      run: |
+        python devscripts/update-version.py ${{ steps.version_suffix.outputs.version_suffix }}
+        make issuetemplates
+    - name: Push to release
+      id: push_release
+      run: |
+        git config --global user.name github-actions
+        git config --global user.email github-actions@example.com
+        git add -u
+        git commit -m "[version] update" -m "Created by: ${{ github.event.sender.login }}" -m ":ci skip all :ci run dl"
+        git push origin --force ${{ github.event.ref }}:release
+        echo "head_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+    - name: Update master
+      env:
+        PUSH_VERSION_COMMIT: ${{ secrets.PUSH_VERSION_COMMIT }}
+      if: "env.PUSH_VERSION_COMMIT != ''"
+      run: git push origin ${{ github.event.ref }}
+
+
+  build_unix:
+    needs: prepare
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+          python-version: '3.11'
+    - uses: conda-incubator/setup-miniconda@v2
+      with:
+          miniforge-variant: Mambaforge
+          use-mamba: true
+          channels: conda-forge
+          auto-update-conda: true
+          activate-environment: ''
+          auto-activate-base: false
+    - name: Prepare
+      run: |
+          python devscripts/update-version.py ${{ needs.prepare.outputs.version_suffix }}
