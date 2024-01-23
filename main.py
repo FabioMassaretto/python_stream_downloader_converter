@@ -46,9 +46,9 @@ def mount_menu_for_videos_to_convert(permitted_video_files_values, total):
         print(f"{i} - {permitted_video_files_values.get(i)}")
 
 def handle_user_url_input(service):
-    return input(f"Enter the {service} URL (99 to exit): ")
+    return input(f"Enter the {service} URL (99 to go back): ")
 
-def _is_link_digit_and_exit(link):
+def _is_digit_and_go_back(link):
     return link.isdigit() and int(link) == 99
 
 def menu_select(main_menu_option):
@@ -60,7 +60,7 @@ def menu_select(main_menu_option):
             print(" Chose => Download Youtube video \n")
             link = handle_user_url_input('youtube')
 
-            if _is_link_digit_and_exit(link):
+            if _is_digit_and_go_back(link):
                 return
             
             pytube = downloader_factory.create('YOUTUBE')
@@ -69,7 +69,7 @@ def menu_select(main_menu_option):
             print(" Chose => Download Spotify audio \n")
             link = handle_user_url_input('spotify')
 
-            if _is_link_digit_and_exit(link):
+            if _is_digit_and_go_back(link):
                 return
             
             savify = downloader_factory.create('SAVIFY')
