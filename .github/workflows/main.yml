@@ -16,6 +16,6 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Get Git Version
-        uses: docker://gittools/gitversion:5.0.2-beta1-34-linux-debian-9-netcoreapp2.1
+        uses: docker://gittools/gitversion:5.8.2-ubuntu.20.04-6.0-amd64
         with:
           args: /github/workspace /nofetch /exec /bin/sh /execargs "-c \"echo $GitVersion_MajorMinorPatch > /github/workspace/version.txt\""
