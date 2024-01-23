@@ -52,11 +52,16 @@ def menu_select(main_menu_option):
 
     match main_menu_option:
         case 1:
-            print(" Chose => Download a Youtube video \n")
+            print(" Chose => Download Youtube video \n")
             link = input("Enter the YouTube video URL: ")
-            youtube_downloader = downloader_factory.create('YOUTUBE')
-            youtube_downloader.download(link)
+            pytube = downloader_factory.create('YOUTUBE')
+            pytube.download(link)
         case 2:
+            print(" Chose => Download Spotify audio \n")
+            link = input("Enter the spotify URL: ")
+            savify = downloader_factory.create('SAVIFY')
+            savify.download(link)
+        case 3:
             print(" Chose => Convert a Youtube video to audio file \n")
             files_to_convert, total_files = load_permitted_video_files_dic()
             pydub_converter = converter_factory.create('PYDUB')
@@ -70,11 +75,12 @@ def menu_select(main_menu_option):
 
 
 def display_menu():
-    print("\n#################### MENU ####################")
-    print("( 1 ) - Download a Youtube video")
-    print("( 2 ) - Convert a Youtube video to audio file")
+    print("\n######################## MAIN MENU ########################")
+    print("( 1 ) - Download a Youtube video (pytube)")
+    print("( 2 ) - Download a Spotify audio (savify) - (Experimental)")
+    print("( 3 ) - Convert video to audio file")
     print("( 0 ) - Exit")
-    print("##############################################")
+    print("#############################################################")
 
 
 def menu():  
