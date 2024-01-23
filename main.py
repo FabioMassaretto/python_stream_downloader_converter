@@ -45,6 +45,11 @@ def mount_menu_for_videos_to_convert(permitted_video_files_values, total):
     for i in permitted_video_files_values:
         print(f"{i} - {permitted_video_files_values.get(i)}")
 
+def handle_user_url_input(service):
+    return input(f"Enter the {service} URL (99 to exit): ")
+
+def _is_link_digit_and_exit(link):
+    return link.isdigit() and int(link) == 99
 
 def menu_select(main_menu_option):
     downloader_factory = DownloaderFactory()
@@ -53,12 +58,20 @@ def menu_select(main_menu_option):
     match main_menu_option:
         case 1:
             print(" Chose => Download Youtube video \n")
-            link = input("Enter the YouTube video URL: ")
+            link = handle_user_url_input('youtube')
+
+            if _is_link_digit_and_exit(link):
+                return
+            
             pytube = downloader_factory.create('YOUTUBE')
             pytube.download(link)
         case 2:
             print(" Chose => Download Spotify audio \n")
-            link = input("Enter the spotify URL: ")
+            link = handle_user_url_input('spotify')
+
+            if _is_link_digit_and_exit(link):
+                return
+            
             savify = downloader_factory.create('SAVIFY')
             savify.download(link)
         case 3:
