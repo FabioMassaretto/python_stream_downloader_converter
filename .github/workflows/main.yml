@@ -136,7 +136,7 @@ jobs:
     #   channel: ${{ steps.setup_variables.outputs.channel }}
     #   origin: ${{ steps.setup_variables.outputs.target_repo }}
     permissions:
-      contents: read
+      contents: write
       packages: write # For package cache
 
   # publish_pypi:
