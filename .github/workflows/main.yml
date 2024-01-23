@@ -138,8 +138,6 @@ jobs:
     permissions:
       contents: read
       packages: write # For package cache
-    secrets:
-      GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
 
   # publish_pypi:
   #   needs: [prepare, build]
