@@ -19,7 +19,7 @@ jobs:
       run: python ./.github/workflows/update_version.py
     - name: switching from HTTPS to SSH
       run: git remote set-url origin ${{ env.SSH }}
-    - name: test SSH
+    - name: test SSH 
       run: ssh -T git@github.com
     - name: set up user email
       run: git config --global user.email "fmassaretto@outlook.com"
