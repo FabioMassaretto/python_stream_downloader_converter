@@ -113,7 +113,7 @@ def menu():
         
         menu_select(option_chose)
     
-    print("Program finnished")
+    print("Program exited.")
     return
 
 
