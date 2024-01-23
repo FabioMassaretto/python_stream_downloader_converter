@@ -1,5 +1,7 @@
 from savify import Savify
 from savify.utils import PathHolder
+from savify.spotify import Spotify
+from savify.types import Type
 import logging
 import os
 from dotenv import load_dotenv, find_dotenv
@@ -22,10 +24,15 @@ class SavifyProvider:
 
     def __init__(self) -> None:
         print(f"\n\nWARNING: This is an experimental feature.")
-        print(f"WARNING: This can take some second/minutes to finish.")
         print(f"INFO: You have to set client_id and client_secret credentials environment for spotify developer https://developer.spotify.com/.\n")
 
 
+    def search(self, query, type: Type = Type.TRACK):
+        spotify = Spotify(self.__api_credentials__)
+        result = spotify.search(query, type)
+        print(result)
+
+
     def download(self, url):
-        print("\n\nDownloading...\n")
+        print("\n\nDownloading... (This can take few seconds/minutes)\n")
         self.__savify__.download(url)
