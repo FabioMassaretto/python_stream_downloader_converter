@@ -40,3 +40,26 @@ jobs:
             python devscripts/update-version.py \
             -c "${resolved_source}" -r "${{ github.repository }}" ${{ '$revision' }} | \
             grep -Po "version=\K\d+\.\d+\.\d+(\.\d+)?")"
+
+  publish_pypi:
+    needs: [prepare]
+    if: ${{ needs.prepare.outputs.pypi_project }}
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write  # mandatory for trusted publishing
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          
+      - name: Prepare
+        env:
+          version: ${{ needs.prepare.outputs.version }}
+          suffix: ${{ needs.prepare.outputs.pypi_suffix }}
+          channel: ${{ needs.prepare.outputs.channel }}
+          target_repo: ${{ needs.prepare.outputs.target_repo }}
+          pypi_project: ${{ needs.prepare.outputs.pypi_project }}
+        run: |
+          python devscripts/update-version.py -c "${{ env.channel }}" -r "${{ env.target_repo }}" -s "${{ env.suffix }}" "${{ env.version }}"
