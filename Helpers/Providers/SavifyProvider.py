@@ -20,7 +20,7 @@ class SavifyProvider:
 
         print(f"\n\nWARNING: This is an experimental feature.")
         print(f"WARNING: This can take some second/minutes to finish.")
-        print(f"INFO: You have to set client_id and client_secret credentials environment for spotify developer https://developer.spotify.com/.")
+        print(f"INFO: You have to set client_id and client_secret credentials environment for spotify developer https://developer.spotify.com/.\n")
 
         s = Savify(api_credentials=api_credentials, path_holder=path_holder, logger=logging)
         s.download(url)
