@@ -88,7 +88,7 @@ def menu_select(main_menu_option):
 
 
 def display_menu():
-    print("\n######################## MAIN MENU ########################")
+    print("\n######################### MAIN MENU #########################")
     print("( 1 ) - Download a Youtube video (pytube)")
     print("( 2 ) - Download a Spotify audio (savify) - (Experimental)")
     print("( 3 ) - Convert video to audio file")
