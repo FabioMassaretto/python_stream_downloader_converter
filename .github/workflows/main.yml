@@ -1,52 +1,8 @@
-name: Release
+name: UpdateVersion
 on:
-  workflow_call:
-    inputs:
-      prerelease:
-        required: false
-        default: true
-        type: boolean
-      source:
-        required: false
-        default: ''
-        type: string
-      target:
-        required: false
-        default: ''
-        type: string
-      version:
-        required: false
-        default: ''
-        type: string
-  workflow_dispatch:
-    inputs:
-      source:
-        description: |
-          SOURCE of this release's updates:
-          channel, repo, tag, or channel/repo@tag
-          (default: <current_repo>)
-        required: false
-        default: ''
-        type: string
-      target:
-        description: |
-          TARGET to publish this release to:
-          channel, tag, or channel@tag
-          (default: <source> if writable else <current_repo>[@source_tag])
-        required: false
-        default: ''
-        type: string
-      version:
-        description: |
-          VERSION: yyyy.mm.dd[.rev] or rev
-          (default: auto-generated)
-        required: false
-        default: ''
-        type: string
-      prerelease:
-        description: Pre-release
-        default: false
-        type: boolean
+  push:
+    branches:
+      - 'main'
 
 permissions:
   contents: read
@@ -64,7 +20,6 @@ jobs:
       target_tag: ${{ steps.setup_variables.outputs.target_tag }}
       pypi_project: ${{ steps.setup_variables.outputs.pypi_project }}
       pypi_suffix: ${{ steps.setup_variables.outputs.pypi_suffix }}
-      head_sha: ${{ steps.get_target.outputs.head_sha }}
 
     steps:
       - uses: actions/checkout@v4
@@ -77,14 +32,10 @@ jobs:
 
       - name: Setup variables
         id: setup_variables
-        env:
-          source_repo: ${{ steps.process_inputs.outputs.source_repo }}
-          source_tag: ${{ steps.process_inputs.outputs.source_tag }}
-          target_repo: ${{ steps.process_inputs.outputs.target_repo }}
-          target_tag: ${{ steps.process_inputs.outputs.target_tag }}
         run: |
-          revision="${{ (inputs.prerelease || !vars.PUSH_VERSION_COMMIT) && '$(date -u +"%H%M%S")' || '' }}"
+          resolved_source='stable'
+          revision="${{ (!vars.PUSH_VERSION_COMMIT) && '$(date -u +"%H%M%S")' || '' }}"
           version="$(
             python devscripts/update-version.py \
-            -c "${resolved_source}" -r "${{ github.repository }}" ${{ inputs.version || '$revision' }} | \
+            -c "${resolved_source}" -r "${{ github.repository }}" ${{ '$revision' }} | \
             grep -Po "version=\K\d+\.\d+\.\d+(\.\d+)?")"
