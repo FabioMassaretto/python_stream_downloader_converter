@@ -31,7 +31,6 @@ jobs:
       id: bump_version
       run: |
         python devscripts/update-version.py ${{ steps.version_suffix.outputs.version_suffix }}
-        make issuetemplates
     - name: Push to release
       id: push_release
       run: |
