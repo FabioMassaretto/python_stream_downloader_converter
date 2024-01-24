@@ -2,7 +2,7 @@ from savify import Savify
 from savify.utils import PathHolder
 from savify.spotify import Spotify
 from savify.types import Type
-import logging
+from savify.logger import Logger
 import os
 from dotenv import load_dotenv, find_dotenv
 
@@ -19,7 +19,9 @@ class SavifyProvider:
     __path_holder__ = PathHolder(downloads_path=__dest_converted_audio_path__)
     __api_credentials__ = (__CLIENT_ID__, __CLIENT_SECRET__)
 
-    __savify__ = Savify(api_credentials=__api_credentials__, path_holder=__path_holder__, group='%artist%/%album%' ,logger=logging)
+    __logger__ = Logger(log_location='./logs', log_level=20)
+
+    __savify__ = Savify(api_credentials=__api_credentials__, path_holder=__path_holder__, group='%artist%/%album%' ,logger=__logger__)
 
 
     def __init__(self) -> None:
