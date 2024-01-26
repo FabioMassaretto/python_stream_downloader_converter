@@ -1,7 +1,3 @@
-# from savify.utils import PathHolder
-# from savify.spotify import Spotify
-# from savify.types import Type
-# from savify.logger import Logger
 import os
 from dotenv import load_dotenv, find_dotenv
 
