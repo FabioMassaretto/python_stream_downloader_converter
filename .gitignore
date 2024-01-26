@@ -162,3 +162,4 @@ cython_debug/
 # Especific to this project
 media/**
 how-to-fix-savity-ytdl-error.txt
+.vscode
