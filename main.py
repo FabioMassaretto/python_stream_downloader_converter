@@ -4,6 +4,8 @@ from Helpers.Utils.ApplicationVariables import ApplicationVariables
 from Helpers.Utils.CollectionsUtils import CollectionsUtils
 from Helpers.Utils.DirectoryUtils import DirectoryUtils
 
+from pytube.exceptions import AgeRestrictedError
+
 queue_video_path = ApplicationVariables().get("QUEUE_VIDEO_PATH")
 
 collections_utils = CollectionsUtils()
@@ -64,15 +66,24 @@ def menu_select(main_menu_option):
                 return
             
             pytube = downloader_factory.create('YOUTUBE')
-            pytube.download(link)
+            try:
+                pytube.download(link)
+            except AgeRestrictedError as ageErr:
+                print(f"\nError: {ageErr}")
+            except Exception as e:
+                print("An error has occurred")
+                print(f"\nError: {e}")
+
         case 2:
             print(" Chose => Download Spotify audio \n")
+            
+            savify = downloader_factory.create('SAVIFY')
+
             link = handle_user_url_input('spotify')
 
             if _is_digit_and_go_back(link):
                 return
             
-            savify = downloader_factory.create('SAVIFY')
             savify.download(link)
         case 3:
             print(" Chose => Convert a Youtube video to audio file \n")
