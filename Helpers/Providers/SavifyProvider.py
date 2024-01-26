@@ -1,12 +1,16 @@
-from savify import Savify
-from savify.utils import PathHolder
-from savify.spotify import Spotify
-from savify.types import Type
-from savify.logger import Logger
+# from savify.utils import PathHolder
+# from savify.spotify import Spotify
+# from savify.types import Type
+# from savify.logger import Logger
 import os
 from dotenv import load_dotenv, find_dotenv
 
 from Helpers.Utils.ApplicationVariables import ApplicationVariables
+from modules.savify.logger import Logger
+from modules.savify.savify import Savify
+from modules.savify.spotify import Spotify
+from modules.savify.types import Type
+from modules.savify.utils import PathHolder
 
 
 class SavifyProvider:
@@ -29,11 +33,14 @@ class SavifyProvider:
         print(f"INFO: You have to set client_id and client_secret credentials environment for spotify developer https://developer.spotify.com/.\n")
 
 
-    def search(self, query, type: Type = Type.TRACK):
+    def search(self, query, type: Type = Type.ARTIST):
         spotify = Spotify(self.__api_credentials__)
-        result = spotify.search(query, type)
-        print(result)
 
+        result_search = spotify.search(query, type, artist_albums=True)
+        # result_list.append(result_search)
+        # result = json.dumps(self.r(result_search.__repr__()), skipkeys=True)
+        for x in result_search:
+            print(x)
 
     def download(self, url):
         print("\n\nDownloading... (This can take few seconds/minutes)\n")
