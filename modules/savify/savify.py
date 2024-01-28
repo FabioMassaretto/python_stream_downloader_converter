@@ -11,9 +11,10 @@ from urllib.error import URLError
 
 import validators
 import tldextract
-from youtube_dl import YoutubeDL
 from ffmpy import FFmpeg, FFRuntimeError
 from requests.exceptions import ConnectionError
+
+from modules.youtube_dl import YoutubeDL
 
 from .utils import PathHolder, safe_path_string, check_env, check_ffmpeg, check_file, create_dir, clean
 from .types import *
@@ -91,7 +92,8 @@ class Savify:
             elif query_type == Type.PLAYLIST:
                 result = self.spotify.search(query, query_type=Type.PLAYLIST)
             elif query_type == Type.ARTIST:
-                result = self.spotify.search(query, query_type=Type.ARTIST, artist_albums=artist_albums)
+                result = self.spotify.search(
+                    query, query_type=Type.ARTIST, artist_albums=artist_albums)
 
         return result
 
@@ -144,7 +146,8 @@ class Savify:
         output_temp = f'{str(self.path_holder.get_temp_dir())}/{track.id}.%(ext)s'
 
         if check_file(output):
-            self.logger.info(f'{str(track)} -> is already downloaded. Skipping...')
+            self.logger.info(
+                f'{str(track)} -> is already downloaded. Skipping...')
             status['returncode'] = 0
             return status
 
@@ -220,7 +223,8 @@ class Savify:
                 return status
 
             status['returncode'] = 0
-            self.logger.info(f'Downloaded -> [{str(self.download_number)}] {str(track)}')
+            self.logger.info(
+                f'Downloaded -> [{str(self.download_number)}] {str(track)}')
             return status
 
         attempt = 0
@@ -234,11 +238,13 @@ class Savify:
             if cover_art_name in self.downloaded_cover_art:
                 cover_art = self.downloaded_cover_art[cover_art_name]
             else:
-                cover_art = self.path_holder.download_file(track.cover_art_url, extension='jpg')
+                cover_art = self.path_holder.download_file(
+                    track.cover_art_url, extension='jpg')
                 self.downloaded_cover_art[cover_art_name] = cover_art
 
             ffmpeg = FFmpeg(executable=self.ffmpeg_location,
-                            inputs={str(output_temp): None, str(cover_art): None, },
+                            inputs={str(output_temp): None,
+                                    str(cover_art): None, },
                             outputs={
                                 str(
                                     output): '-loglevel quiet -hide_banner -y -map 0:0 -map 1:0 -c copy -id3v2_version 3 '
@@ -270,6 +276,7 @@ class Savify:
             remove(output_temp)
         except OSError:
             pass
-        
-        self.logger.info(f'Downloaded -> [{str(self.download_number)}] {str(track)}')
+
+        self.logger.info(
+            f'Downloaded -> [{str(self.download_number)}] {str(track)}')
         return status
