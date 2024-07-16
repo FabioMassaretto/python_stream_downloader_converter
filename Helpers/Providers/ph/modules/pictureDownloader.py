@@ -44,7 +44,7 @@ def main():
             img = soup.find("div", "centerImage").find(
                 "video").find("source")["src"]
         except AttributeError as ae:
-            print('Error: No img could be found! Message: ' + ae)
+            print('Error: No img could be found! Message: ' + repr(ae))
             continue
 
         title = soup.title.text
