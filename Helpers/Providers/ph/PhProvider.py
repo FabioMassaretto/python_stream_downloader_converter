@@ -37,4 +37,7 @@ class PhProvider:
             if (option == '99'):
                 break
 
-            menu_options[option]["function"]()
+            try:
+                menu_options[option]["function"]()
+            except KeyError:
+                print('Invalid Option!', end='\n\n')
