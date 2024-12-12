@@ -12,9 +12,9 @@ def populate_dict_permitted_video_files():
     files_in_queue_folder = os.listdir(queue_video_path)
 
     for file in files_in_queue_folder:
-        extension_period_index = str(file).index(".")
-        file_extension = file[extension_period_index:]
-
+        extension_dot = str(file).rfind('.')
+        file_extension = str(file)[extension_dot:]
+        
         if file_extension in permitted_file_extension and file not in permitted_video_files_dic:
             index = len(permitted_video_files_dic)
             new_item_dict = {index: file}
