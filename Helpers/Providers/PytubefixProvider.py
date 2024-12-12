@@ -3,7 +3,7 @@ from Helpers.Utils import InputUtils
 from Helpers.Utils.ApplicationVariables import ApplicationVariables
 from Helpers.Utils.FileMover import FileMover
 
-from pytube.exceptions import AgeRestrictedError
+from pytubefix.exceptions import AgeRestrictedError
 
 
 class PytubefixProvider:
