@@ -1,9 +1,9 @@
-from modules.pytube import YouTube
+from pytube import YouTube
 from Helpers.Utils import InputUtils
 from Helpers.Utils.ApplicationVariables import ApplicationVariables
 from Helpers.Utils.FileMover import FileMover
 
-from modules.pytube.exceptions import AgeRestrictedError
+from pytube.exceptions import AgeRestrictedError
 
 
 class YoutubeProvider:
