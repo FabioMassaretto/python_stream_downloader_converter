@@ -58,8 +58,8 @@ class PydubConverter:
     def __convert_to_audio__(self, from_file_path, dest_path, video_files_dic, index, format_type="mp3"):
         file = video_files_dic.get(index)
 
-        extension_period_index = str(file).index('.')
-        new_filename_without_extension = file[:extension_period_index]
+        extension_dot = str(file).rfind('.')
+        new_filename_without_extension = str(file).removesuffix(str(file)[extension_dot:])
 
         full_dest_file_path = dest_path + new_filename_without_extension
         full_from_file_path = from_file_path + file
@@ -67,8 +67,7 @@ class PydubConverter:
         print(f"\n\nConverting: {file}...")
 
         try:
-            AudioSegment.from_file(full_from_file_path).export(
-                full_dest_file_path + "." + format_type, format=format_type)
+            AudioSegment.from_file(full_from_file_path).export(full_dest_file_path + "." + format_type, format=format_type) # TODO: for yt-dlp provider there is an list out range error because of not gtting the audio stream only video, the problem is inside pydub lib
             os.remove(full_from_file_path)
             self.quantity_converted += 1
 
@@ -77,5 +76,6 @@ class PydubConverter:
             print("\nERROR: The file was not found")
 
             return False
-        except:
+        except Exception as e:
+            print(f'ERROR: {repr(e)}')
             return False
