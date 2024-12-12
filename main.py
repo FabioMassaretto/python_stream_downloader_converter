@@ -11,6 +11,9 @@ def menu_select(main_menu_option):
     option_id = menu_options.get(main_menu_option)[0]
 
     match option_id:
+        case 'yt_dlp':
+            downloader_factory.create('YTDLP')
+        
         case 'pytube':
             downloader_factory.create('YOUTUBE')
 
@@ -31,12 +34,13 @@ def menu_select(main_menu_option):
 
 
 menu_options: dict = {
-    1: ["pytube", "Download a Youtube video (pytube)"],
-    2: ["pytube3", "Download a Youtube video (pytube3) !deprecated¡"],
-    3: ["pytubefix", "Download a Youtube video (pytubefix)"],
-    4: ["phube", "Download a PH video or image (PH)"],
-    5: ["savify", "Download a Spotify audio (savify) - (Experimental)"],
-    6: ["convert", "Convert video to audio file"],
+    1: ["yt_dlp", "Download a Youtube video with (yt_dlp)"],
+    2: ["pytube", "Download a Youtube video with (pytube) !deprecated¡"],
+    3: ["pytube3", "Download a Youtube video with (pytube3) !deprecated¡"],
+    4: ["pytubefix", "Download a Youtube video with (pytubefix)"],
+    5: ["phube", "Download a PH video or image (PH)"],
+    6: ["savify", "Download a Spotify audio (savify) - (Experimental)"],
+    7: ["convert", "Convert video to audio file"],
     0: ["exit", "Exit"],
 }
 
