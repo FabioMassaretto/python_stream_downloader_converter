@@ -19,8 +19,8 @@ import re
 from itertools import chain
 from typing import List, Tuple, Dict, Callable, Any, Optional
 
-from pytube.exceptions import RegexMatchError
-from pytube.helpers import regex_search, cache
+from pytubefix.exceptions import RegexMatchError
+from pytubefix.helpers import regex_search, cache
 
 logger = logging.getLogger(__name__)
 

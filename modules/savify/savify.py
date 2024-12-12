@@ -3,7 +3,7 @@
 __all__ = ['Savify']
 
 import time
-import logging
+# import logging
 from multiprocessing import cpu_count
 from multiprocessing.dummy import Pool as ThreadPool
 from pathlib import Path
@@ -14,7 +14,9 @@ import tldextract
 from ffmpy import FFmpeg, FFRuntimeError
 from requests.exceptions import ConnectionError
 
-from modules.youtube_dl import YoutubeDL
+# from modules.youtube_dl import YoutubeDL
+from yt_dlp import YoutubeDL
+from yt_dlp.utils import RegexNotFoundError
 
 from .utils import PathHolder, safe_path_string, check_env, check_ffmpeg, check_file, create_dir, clean
 from .types import *
@@ -122,13 +124,13 @@ class Savify:
         clean(self.path_holder.get_temp_dir())
 
         message = f'Download Finished!\n\tCompleted {len(queue) - len(failed_jobs)}/{len(queue)}' \
-                  f' songs in {time.time() - start_time:.0f}s\n'
+            f' songs in {time.time() - start_time:.0f}s\n'
 
         if len(failed_jobs) > 0:
             message += '\n\tFailed Tracks:\n'
             for failed_job in failed_jobs:
                 message += f'\n\tSong:\t{str(failed_job["track"])}' \
-                           f'\n\tReason:\t{failed_job["error"]}\n'
+                    f'\n\tReason:\t{failed_job["error"]}\n'
 
         self.logger.info(message)
 
@@ -143,7 +145,8 @@ class Savify:
         output = self.path_holder.get_download_dir() / f'{_sort_dir(track, self.group)}' / safe_path_string(
             f'{str(track)}.{self.download_format}')
 
-        output_temp = f'{str(self.path_holder.get_temp_dir())}/{track.id}.%(ext)s'
+        output_temp = f'{str(self.path_holder.get_temp_dir())
+                         }/{track.id}.%(ext)s'
 
         if check_file(output):
             self.logger.info(
@@ -204,12 +207,16 @@ class Savify:
                     if check_file(Path(output_temp)):
                         downloaded = True
                         self.download_number += 1
-            except YoutubeDlExtractionError as ex:
+            except YoutubeDlExtractionError as ydl_ex:
                 if attempt > self.retry:
                     status['returncode'] = 1
                     status['error'] = "Failed to download song."
-                    self.logger.error(ex.message)
+                    self.logger.error(ydl_ex.message)
                     return status
+            except RegexNotFoundError as rexnfe:
+                print(f"Module Savify RegEx Error: {rexnfe}", end='\n')
+            except Exception as ex:
+                print(f"Module Savify Error: {ex}", end='\n')
 
         from shutil import move, Error as ShutilError
 

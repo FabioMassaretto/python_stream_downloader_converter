@@ -4,9 +4,9 @@ import os
 import time
 import xml.etree.ElementTree as ElementTree
 from typing import Dict, Optional
-from pytube import request
+from pytubefix import request
 from html import unescape
-from pytube.helpers import safe_filename, target_directory
+from pytubefix.helpers import safe_filename, target_directory
 
 
 class Caption:
