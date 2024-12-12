@@ -161,5 +161,7 @@ cython_debug/
 
 # Especific to this project
 media/**
+Scripts/
 how-to-fix-savity-ytdl-error.txt
 .vscode
+pyvenv.cfg
