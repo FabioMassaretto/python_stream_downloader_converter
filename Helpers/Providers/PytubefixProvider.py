@@ -9,6 +9,8 @@ from pytubefix.exceptions import AgeRestrictedError
 class PytubefixProvider:
     __dest_downloaded_video_path__ = ApplicationVariables().get(
         "DEST_DOWNLOADED_VIDEO_PATH")
+    
+    file_mover = FileMover()
 
     def __init__(self):
         print(" Chose => Download Youtube video \n")
@@ -52,4 +54,4 @@ class PytubefixProvider:
             if convert_answer in ("no", "n"):
                 return
 
-            FileMover.move_to_queue_dir(file_path)
+            self.file_mover.move_to_queue_dir(file_path)

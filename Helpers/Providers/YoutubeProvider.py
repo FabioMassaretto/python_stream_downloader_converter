@@ -45,8 +45,6 @@ class YoutubeProvider:
 
             youtubeObject.streams.order_by('resolution').desc().first().download(
                 output_path=self.__dest_downloaded_video_path__)
-            # youtubeObject.streams.get_by_itag(int(selected_resolution)).download(
-            #     output_path=self.__dest_downloaded_video_path__)
         except AgeRestrictedError as ageErr:
             print(f"\nError: {ageErr}")
         except Exception as e:
