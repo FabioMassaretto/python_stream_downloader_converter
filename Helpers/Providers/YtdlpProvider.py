@@ -7,7 +7,6 @@ from Helpers.Utils.FileMover import FileMover
 class YtdlpProvider:
     file_mover = FileMover()
     __dest_downloaded_video_path__ = ApplicationVariables().get("DEST_DOWNLOADED_VIDEO_PATH")
-    video_filename = ''
 
     def __init__(self):
         print(" Chose => Download Youtube video \n")
@@ -19,58 +18,77 @@ class YtdlpProvider:
         self.download(link)
         
 
-    def my_hook(self, d):
+    def my_hook(d):
         if d['status'] == 'finished':
-            print('Done downloading, now converting ...')
-            self.video_filename = f'{d['info_dict']['title']}.{d['info_dict']['ext']}'
-
-    
-    def download(self, link):
-        ydl_opts = {
-            'outtmpl': '%(title)s.%(ext)s',
-            'progress_hooks': [self.my_hook],
-            'paths': {'home': self.__dest_downloaded_video_path__ },
-            'format': 'bestvideo[height<=1080][ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
-            'allow_multiple_audio_streams': True,
-        }
-        try:
-            # Having issues with video title when has double quotes in it,
-            # so the workaround was first replace with empty string, altering
-            # the outtpml in ydl_opts
-            with YoutubeDL() as ytdlp:
-                info = ytdlp.extract_info(link)
-                
-                title: str = info['title']
-                
-                disalowed_characters = ApplicationVariables().get("DISALOWED_CHARACTERS")
-                
-                found_character = [1 for char in disalowed_characters if title.count(char) > 0]
-                
-                if len(found_character) > 0:
-                    title_sanitazed = self.file_mover.filename_sanitizer(title)
-                    
-                    ydl_opts.update({'outtmpl': f'{title_sanitazed}.%(ext)s'})
-                
-            with YoutubeDL(ydl_opts) as ytdlp:
-                
-                ytdlp.download(link)
-                downloaded_folder_path = ytdlp.get_output_path()
-                full_video_path = downloaded_folder_path + self.video_filename
-                new_full_video_path = self.file_mover.filename_sanitizer(full_video_path)
-                
-            self.move_for_audio_extraction(new_full_video_path)
-                
-        except DownloadError  as e:
-            print(f"Error downloading {link}: {str(e)}", end='\n')
+            print('\nDone downloading, now converting ...', end='\n')
             
-    def move_for_audio_extraction(self, full_video_path):
-        convert_answer = input("Do you want to queue this video for audio extraction? (yes(y) or no(n)): ")
+            video_ext = d['info_dict']['ext']
+            video_title = d['info_dict']['title']
+            temp_full_filename = d['filename']
+            new_filename = f'{video_title}.{video_ext}'
+            YtdlpProvider.process_finished_download(temp_full_filename, new_filename)
+
+
+    @staticmethod
+    def process_finished_download(temp_filename, new_filename):
+        # Having issues with video title when has double quotes in it,
+        # so the workaround was first replace with empty string, altering
+        # the outtpml in ydl_opts
+        new_video_filename = FileMover.filename_sanitizer(new_filename)
+        
+        FileMover.rename_downloaded_file(temp_filename, new_video_filename)
+            
+        YtdlpProvider.queue_for_audio_extraction(new_video_filename)
+    
+    
+    ydl_opts = {
+        # 'logger': YtDlpLogger(),
+        'outtmpl': '%(id)s.%(ext)s',
+        'progress_hooks': [my_hook],
+        'paths': {'home': __dest_downloaded_video_path__ },
+        'format': 'bestvideo[height<=1080][ext=mp4]+bestaudio/best[height<=1080]',
+        # 'allow_multiple_audio_streams': True,
+    }
+    
+    def download(self, link, opt=ydl_opts):
+        try:               
+            with YoutubeDL(opt) as ytdlp:
+                ytdlp.download(link)
+                
+                # info = ytdlp.extract_info(link, download=False)
+        except DownloadError as de:
+            print(f'Error downloading {link}: {str(de)}', end='\n')
+        except Exception as e:
+            print(f'Error: {repr(e)}', end='\n')
+            
+    @staticmethod
+    def queue_for_audio_extraction(filename):
+        convert_answer = input(f"Do you want to queue '{filename}' for audio extraction? (yes(y) or no(n)): ")
             
         while convert_answer not in ("yes", "y", "no", "n"):
             convert_answer = input(
-                "Invalid answer. Do you want to queue this video for audio extraction? yes(y) or no(n): ")
+                f"Invalid answer. Do you want to queue '{filename}' for audio extraction? yes(y) or no(n): ")
         else:
             if convert_answer in ("no", "n"):
                 return
-            
-            self.file_mover.move_to_queue_dir(full_video_path)
+
+            FileMover.move_to_queue_dir(filename)
+
+
+class YtDlpLogger:
+    def debug(self, msg):
+        # For compatibility with youtube-dl, both debug and info are passed into debug
+        # You can distinguish them by the prefix '[debug] '
+        if msg.startswith('[debug] '):
+            print(msg)
+        else:
+            self.info(msg)
+
+    def info(self, msg):
+        print(msg)
+
+    def warning(self, msg):
+        print(msg)
+
+    def error(self, msg):
+        print(msg)

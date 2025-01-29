@@ -9,53 +9,81 @@ class FileMover:
     DOWNLOADED_VIDEO_PATH = ApplicationVariables().get("DEST_DOWNLOADED_VIDEO_PATH")
     QUEUE_VIDEO_PATH = ApplicationVariables().get("QUEUE_VIDEO_PATH")
     
-    def move_to_queue_dir(self, file_path):
-        full_path = Path(file_path)
-
-        full_filename = full_path.name
-
-        full_path_origin = self.DOWNLOADED_VIDEO_PATH + full_filename
-        full_path_destination = self.QUEUE_VIDEO_PATH + full_filename
-
-        is_copy = self.copy2(full_path_origin, full_path_destination)
-
-        print(f"\nVideo: {full_filename} added to the queue.\n") if is_copy else print('\nFailed to copy! See error above.')
-
-    def rename_file(self, from_path, to_path):
-        is_renamed = self.copy2(from_path, to_path)
-
-        print(f"\nFile: {from_path} was renamed to {to_path}.\n") if is_renamed else print('\nFailed to rename! See error above.')
+    @staticmethod
+    def rename_downloaded_file(temp_video_filename, final_video_filename):
+        downloaded_folder_path = FileMover.DOWNLOADED_VIDEO_PATH
+        temp_filename = Path(temp_video_filename).name
+        full_path_old_name = downloaded_folder_path + temp_filename
+        full_path_new_name = downloaded_folder_path + final_video_filename
         
-    def copy2(self, from_path, to_path):
+        try:
+            FileMover.__rename_file__(full_path_old_name, full_path_new_name)
+            
+            print(f"[FileMover] - Renaming: Video was renamed from '{temp_video_filename}' to '{final_video_filename}'.", end='\n') 
+
+        except PermissionError as pe:
+            print(f'[ERROR][FileMover] - {repr(pe)}')
+        except FileExistsError | FileNotFoundError as fe:
+            print(f'[ERROR][FileMover] - {repr(fe)}')
+        except Exception as e:
+            print(f'[ERROR][FileMover] - {repr(e)}')
+    
+    
+    @staticmethod
+    def move_to_queue_dir(filename):
+        download_folder_path = FileMover.DOWNLOADED_VIDEO_PATH
+        download_full_path = download_folder_path + filename
+        
+        queue_folder_path = FileMover.QUEUE_VIDEO_PATH
+        queue_full_path = queue_folder_path + filename
+
+        is_coppied = FileMover.copy2(download_full_path, queue_full_path)
+
+        print(f"[FileMover] - Moving: Video -> {queue_full_path} was added to the queue.", end='\n') if is_coppied else print('\nMoving: Failed to move to queue! See error above.')
+
+
+    @staticmethod
+    def __rename_file__(from_path, to_path):
+        from_path = Path(from_path)
+        to_path = Path(to_path)
+        try:
+            if not os.path.exists(to_path):
+                FileMover.copy2(from_path, to_path)
+                print(f"[FileMover] - Renaming File: {from_path} renamed to {to_path}.", end='\n')
+            else:
+                print(f"[FileMover] - Renaming File: {to_path} already exists.", end='\n')
+                
+                
+            if os.path.exists(from_path):
+                os.remove(from_path)
+                print(f"[FileMover] - Renaming File: {from_path} removed.", end='\n')
+                
+        except PermissionError as pe:
+            print(f'[ERROR][FileMover] - {repr(pe)}')
+        except (FileExistsError, FileNotFoundError) as fe:
+            print(f'[ERROR][FileMover] - {repr(fe)}')
+        except Exception as e:
+            print(f'[ERROR][FileMover] - {repr(e)}')
+        
+        
+    @staticmethod
+    def copy2(from_path, to_path):
         try:
             shutil.copy2(from_path, to_path)
             return True
         except Exception as ex:
-            print(f'Error: {repr(ex)}')
+            print(f'[ERROR][FileMover] - {repr(ex)}')
             return False
             
-    def filename_sanitizer(self, filename):
+            
+    @staticmethod
+    def filename_sanitizer(filename):
+        print(f'[FileMover] - File before sanitazing {filename}', end='\n')
         disalowed_characters = ApplicationVariables().get("DISALOWED_CHARACTERS")
-        new_filename = ''
+        new_filename = filename
         
         for char in disalowed_characters:
-            new_filename = filename.replace(char, '')
+            new_filename = new_filename.replace(char, '')
         
+        print(f'[FileMover] - File after sanitazing {new_filename}', end='\n')
         return new_filename
-        
-        # if os.path.exists(self.DOWNLOADED_VIDEO_PATH):
-        #     files_in_dir_list = os.listdir(self.DOWNLOADED_VIDEO_PATH)
-
-        #     for file in files_in_dir_list:
-        #         found_char = False
-        #         for char in sanitazer_character:
-        #             if char in file:
-        #                 old_full_path = self.DOWNLOADED_VIDEO_PATH + file
-        #                 new_filename = file.replace(char, '')
-        #                 new_full_path = self.DOWNLOADED_VIDEO_PATH + new_filename
-        #                 self.rename_file(old_full_path, new_full_path)
-
-                    
-        #             if found_char:
-        #                 found_char = False
-        #                 break
