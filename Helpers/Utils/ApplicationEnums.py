@@ -12,5 +12,5 @@ class ApplicationEnums(Enum):
     DEST_DOWNLOADED_PH_VIDEO_PATH = f"{BASE_MEDIA_PATH}/ph_downloaded/video"
     DEST_TEMP_PH_VIDEO_PATH = f"{BASE_MEDIA_PATH}/temp/video"
     DEST_PICTURES_PATH = f"{BASE_MEDIA_PATH}/pictures"
-    PERMITTED_FILE_EXTENSIONS = ['.mp4', '.mkv', '.webm']
+    ALLOWED_FILE_EXTENSIONS = ['.mp4', '.mkv', '.webm']
     DISALOWED_CHARACTERS =['＂', '"', '/', '\\']

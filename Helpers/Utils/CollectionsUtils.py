@@ -2,7 +2,7 @@ import os
 from Helpers.Utils.ApplicationVariables import ApplicationVariables
 
 queue_video_path = ApplicationVariables().get("QUEUE_VIDEO_PATH")
-permitted_file_extension = ApplicationVariables().get("PERMITTED_FILE_EXTENSIONS")
+allowed_file_extensions = ApplicationVariables().get("ALLOWED_FILE_EXTENSIONS")
 
 permitted_video_files_dic = dict()
 
@@ -15,7 +15,7 @@ def populate_dict_permitted_video_files():
         extension_dot = str(file).rfind('.')
         file_extension = str(file)[extension_dot:]
         
-        if file_extension in permitted_file_extension and file not in permitted_video_files_dic:
+        if file_extension in allowed_file_extensions and file not in permitted_video_files_dic:
             index = len(permitted_video_files_dic)
             new_item_dict = {index: file}
             permitted_video_files_dic.update(new_item_dict)
