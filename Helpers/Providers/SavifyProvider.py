@@ -27,7 +27,7 @@ class SavifyProvider:
                         path_holder=__path_holder__, group='%artist%/%album%', logger=__logger__)
 
     def __init__(self) -> None:
-        print(" Chose => Download Spotify audio", end='\n')
+        print(" Selected => Download Spotify audio", end='\n')
 
         print(f"\n\nWARNING: This is an experimental feature.")
         print(f"INFO: You have to set client_id and client_secret credentials environment for spotify developer https://developer.spotify.com/.", end='\n\n')

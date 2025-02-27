@@ -533,7 +533,7 @@ class ORFONBase(InfoExtractor):
         # Segmented episode without valid segment id: return entire playlist
         # Segmented episode with valid segment id and yes-playlist: return entire playlist
         # Segmented episode with valid segment id and no-playlist: return single video corresponding to segment id
-        # If a multi_video playlist would be returned, but an unsegmented source exists, that source is chosen instead.
+        # If a multi_video playlist would be returned, but an unsegmented source exists, that source is selectedn instead.
 
         api_json = self._call_api(video_id)
 

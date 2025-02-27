@@ -14,13 +14,13 @@ class PydubConverter:
     quantity_converted = 0
 
     def __init__(self):
-        print(" Chose => Convert a Youtube video to audio file \n")
+        print(" Selected => Convert a Youtube video to audio file \n")
         files_to_convert, total_files = load_permitted_video_files_dic()
 
         try:
             mount_menu_for_videos_to_convert(files_to_convert, total_files)
-            option_chose = validate_return_user_input_choose(total_files)
-            self.process_convert_to_audio(option_chose, files_to_convert)
+            option_selected = validate_return_user_input_choose(total_files)
+            self.process_convert_to_audio(option_selected, files_to_convert)
 
         except IndexError as ierr:
             print(ierr)

@@ -55,19 +55,19 @@ def display_menu():
 def menu():
     while True:
         display_menu()
-        option_chose = input("Enter the option number: ")
+        option_selected = input("Enter the option number: ")
         print()
 
-        if not option_chose.isdigit():
-            while not option_chose.isdigit():
-                option_chose = input("Enter a valid option number: ")
+        if not option_selected.isdigit():
+            while not option_selected.isdigit():
+                option_selected = input("Enter a valid option number: ")
 
-        option_chose = int(option_chose)
+        option_selected = int(option_selected)
 
-        if option_chose <= 0:
+        if option_selected <= 0:
             break
 
-        menu_select(option_chose)
+        menu_select(option_selected)
 
     print("Program exited.")
     return

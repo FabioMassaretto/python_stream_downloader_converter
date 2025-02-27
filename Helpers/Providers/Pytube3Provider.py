@@ -11,7 +11,7 @@ class Pytube3Provider:
         "DEST_DOWNLOADED_VIDEO_PATH")
 
     def __init__(self):
-        print(" Chose => Download Youtube video \n")
+        print(" Selected => Download Youtube video \n")
         link = InputUtils.handle_user_url_input('youtube')
 
         if InputUtils.is_digit_and_go_back(link):

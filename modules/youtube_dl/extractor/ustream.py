@@ -45,7 +45,7 @@ class UstreamIE(InfoExtractor):
             'title': '-CG11- Canada Games Figure Skating',
             'uploader': 'sportscanadatv',
         },
-        'skip': 'This Pro Broadcaster has chosen to remove this video from the ustream.tv site.',
+        'skip': 'This Pro Broadcaster has selectedn to remove this video from the ustream.tv site.',
     }, {
         'url': 'http://www.ustream.tv/embed/10299409',
         'info_dict': {

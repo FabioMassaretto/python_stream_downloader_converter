@@ -166,7 +166,7 @@ class VoxMediaIE(InfoExtractor):
             'id': '1231c973d',
             'ext': 'mp4',
             'title': 'Post-Post-PC CEO: The Full Code Conference Video of Microsoft\'s Satya Nadella',
-            'description': 'The longtime veteran was chosen earlier this year as the software giant\'s third leader in its history.',
+            'description': 'The longtime veteran was selectedn earlier this year as the software giant\'s third leader in its history.',
             'timestamp': 1402938000,
             'upload_date': '20140616',
             'duration': 4114,
