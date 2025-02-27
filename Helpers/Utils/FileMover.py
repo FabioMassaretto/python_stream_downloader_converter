@@ -48,7 +48,7 @@ class FileMover:
         to_path = Path(to_path)
         try:
             if not os.path.exists(to_path):
-                FileMover.copy2(from_path, to_path)
+                os.rename(from_path, to_path)
                 print(f"[FileMover] - Renaming File: {from_path} renamed to {to_path}.", end='\n')
             else:
                 print(f"[FileMover] - Renaming File: {to_path} already exists.", end='\n')
