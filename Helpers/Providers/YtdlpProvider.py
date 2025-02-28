@@ -35,7 +35,7 @@ class YtdlpProvider:
                     extract_info = ytdlp.extract_info(link, download=False)
                     video_filename = extract_info['fulltitle']
                     video_extension = extract_info['ext']
-                    full_video_extension = f'{video_filename}.{video_extension}'
+                    full_video_filename = f'{video_filename}.{video_extension}'
                 except DownloadError as de:
                     print(f'Error downloading {link}: {str(de)}', end='\n')
                     return
@@ -44,7 +44,7 @@ class YtdlpProvider:
                     return
                 
                 # info = ytdlp.extract_info(link, download=False)
-            YtdlpProvider.queue_for_audio_extraction(full_video_extension)
+            YtdlpProvider.queue_for_audio_extraction(full_video_filename)
             
     @staticmethod
     def queue_for_audio_extraction(filename):
