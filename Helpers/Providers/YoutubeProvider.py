@@ -32,16 +32,15 @@ class YoutubeProvider:
 
             while True:
                 selected_resolution = input(
-                    'Select the resolution by itag number (99 to exit): ')
+                    f'Select the resolution by itag number ({InputUtils.EXIT_NUMBER} to exit): ')
 
-                if (selected_resolution == '99'):
+                if (selected_resolution == '0'):
                     break
 
                 if (int(selected_resolution) in resolutions_list):
                     break
 
-                print(f'Itag number {
-                      selected_resolution} not found. Choose another one.')
+                print(f'Itag number {selected_resolution} not found. Choose another one.')
 
             youtubeObject.streams.order_by('resolution').desc().first().download(
                 output_path=self.__dest_downloaded_video_path__)

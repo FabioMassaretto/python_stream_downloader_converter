@@ -13,7 +13,7 @@ class PhProvider:
         menu_options = {
             "1":  {"function": videoDownloader.main, "name": "Download Video"},
             "2":  {"function": pictureDownloader.main, "name": "Download album or picture"},
-            "99":  {"name": "Exit"}
+            "0":  {"name": "Exit"}
         }
 
         while True:
@@ -34,7 +34,7 @@ class PhProvider:
 
             option = input("\n>>> ")
 
-            if (option == '99'):
+            if (option == '0'):
                 break
 
             try:
