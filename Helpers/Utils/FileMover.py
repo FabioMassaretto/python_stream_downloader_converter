@@ -28,8 +28,15 @@ class FileMover:
         
     @staticmethod
     def copy2(from_path, to_path):
+        from_path_converted = Path(from_path)
+        to_path_converted = Path(to_path)
+        
+        if not from_path_converted.exists():
+            print(f"[ERROR] Arquivo de origem não encontrado: {from_path}")
+            return False
+        
         try:
-            shutil.copy2(from_path, to_path)
+            shutil.copy2(from_path_converted, to_path_converted)
             return True
         except Exception as ex:
             print(f'[ERROR][FileMover] - {repr(ex)}')
