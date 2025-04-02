@@ -20,6 +20,7 @@ class YtdlpProvider:
     
     ydl_opts = {
         'outtmpl': '%(fulltitle)s.%(ext)s',
+        'windowsfilenames': True,
         # 'progress_hooks': [my_hook],
         'paths': {'home': __dest_downloaded_video_path__ },
         'format': 'bestvideo[height=1080][ext=mp4]+bestaudio[ext=m4a]/best[height<=1080]'
@@ -45,6 +46,7 @@ class YtdlpProvider:
                 
                 # info = ytdlp.extract_info(link, download=False)
             YtdlpProvider.queue_for_audio_extraction(full_video_filename)
+          
             
     @staticmethod
     def queue_for_audio_extraction(filename):
@@ -59,30 +61,3 @@ class YtdlpProvider:
                 return
 
             FileMover.move_to_queue_dir(filename)
-            
-    ##
-    #
-    # Not used anymore but left here for future look up how it was done
-    # It will be deleted in future
-    #
-    # def my_hook(d):
-        #     if d['status'] == 'finished':
-        #         print('\nDone downloading, now converting ...', end='\n')
-                
-        #         video_ext = d['info_dict']['ext']
-        #         video_title = d['info_dict']['title']
-        #         temp_full_filename = d['filename']
-        #         new_filename = f'{video_title}.{video_ext}'
-        #         # YtdlpProvider.process_finished_download(temp_full_filename, new_filename)
-
-
-    # @staticmethod
-    # def process_finished_download(temp_filename, new_filename):
-    #     # Having issues with video title when has double quotes in it,
-    #     # so the workaround was first replace with empty string, altering
-    #     # the outtpml in ydl_opts
-    #     new_video_filename = FileMover.filename_sanitizer(new_filename)
-        
-    #     FileMover.rename_downloaded_file(temp_filename, new_video_filename)
-            
-    #     YtdlpProvider.queue_for_audio_extraction(new_video_filename)
