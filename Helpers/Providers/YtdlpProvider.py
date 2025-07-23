@@ -1,4 +1,5 @@
 from yt_dlp import YoutubeDL, DownloadError
+from pathlib import Path
 from Helpers.Utils import InputUtils
 from Helpers.Utils.ApplicationVariables import ApplicationVariables
 from Helpers.Utils.FileMover import FileMover
@@ -31,12 +32,17 @@ class YtdlpProvider:
     
     def download(self, link, opt=ydl_opts):
             with YoutubeDL(opt) as ytdlp:
-                try:               
+                try:
+                    # Step 1: Extract info BEFORE download to get metadata
+                    info = ytdlp.extract_info(link, download=False)
+
+                    # Step 2: Get the actual file name yt_dlp will save to
+                    actual_file_path = Path(ytdlp.prepare_filename(info))
+
+                    # Step 3: Download using this info (won’t re-download if already done)
                     ytdlp.download(link)
-                    extract_info = ytdlp.extract_info(link, download=False)
-                    video_filename = extract_info['fulltitle']
-                    video_extension = extract_info['ext']
-                    full_video_filename = f'{video_filename}.{video_extension}'
+
+                    print(f"[DEBUG] Real saved path: {actual_file_path}")
                 except DownloadError as de:
                     print(f'Error downloading {link}: {str(de)}', end='\n')
                     return
@@ -44,8 +50,10 @@ class YtdlpProvider:
                     print(f'Error: {repr(e)}', end='\n')
                     return
                 
-                # info = ytdlp.extract_info(link, download=False)
-            YtdlpProvider.queue_for_audio_extraction(full_video_filename)
+            print(f"[DEBUG] Downloaded file: {actual_file_path}")
+                
+            # info = ytdlp.extract_info(link, download=False)
+            YtdlpProvider.queue_for_audio_extraction(actual_file_path)
           
             
     @staticmethod
