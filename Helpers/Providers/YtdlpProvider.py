@@ -22,6 +22,7 @@ class YtdlpProvider:
     ydl_opts = {
         'outtmpl': '%(fulltitle)s.%(ext)s',
         'windowsfilenames': True,
+        'check_formats': 'selected',
         # 'progress_hooks': [my_hook],
         'paths': {'home': __dest_downloaded_video_path__ },
         'format': 'bestvideo[height=1080][ext=mp4]+bestaudio[ext=m4a]/best[height<=1080]'
