@@ -1,9 +1,7 @@
 pydub==0.25.1
 savify==2.3.4
 youtube-dl==2021.12.17
-yt-dlp==2025.03.27
-# yt-dlp==2022.10.22
-#yt-dlp[default]
+yt-dlp==2025.11.12
 python-dotenv==1.0.1
 pytubefix==8.3.2
 pytube2==15.0.11
