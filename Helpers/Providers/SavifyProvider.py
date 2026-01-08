@@ -8,6 +8,9 @@ from modules.savify.savify import Savify
 from modules.savify.spotify import Spotify
 from modules.savify.types import Type
 from modules.savify.utils import PathHolder
+from config.LoggerConfig import logging
+
+logger = logging.getLogger(__name__)
 
 
 class SavifyProvider:
@@ -27,11 +30,10 @@ class SavifyProvider:
                         path_holder=__path_holder__, group='%artist%/%album%', logger=__logger__)
 
     def __init__(self) -> None:
-        print(" Selected => Download Spotify audio", end='\n')
+        logger.warning("This is an experimental feature.")
+        logger.info("You have to set client_id and client_secret credentials environment for spotify developer https://developer.spotify.com/.")
 
-        print(f"\n\nWARNING: This is an experimental feature.")
-        print(f"INFO: You have to set client_id and client_secret credentials environment for spotify developer https://developer.spotify.com/.", end='\n\n')
-
+        print("\n\n")
         link = InputUtils.handle_user_url_input('spotify')
 
         if InputUtils.is_digit_and_go_back(link):
@@ -46,8 +48,9 @@ class SavifyProvider:
         # result_list.append(result_search)
         # result = json.dumps(self.r(result_search.__repr__()), skipkeys=True)
         for x in result_search:
-            print(x)
+            logger.info(x)
 
     def download(self, url):
-        print("\n\nDownloading... (This can take few seconds/minutes)\n")
+        logger.info("Downloading... (This can take few seconds/minutes)")
+        print("\n")
         self.__savify__.download(url)

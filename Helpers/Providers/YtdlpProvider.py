@@ -3,14 +3,15 @@ from pathlib import Path
 from Helpers.Utils import InputUtils
 from Helpers.Utils.ApplicationVariables import ApplicationVariables
 from Helpers.Utils.FileMover import FileMover
+from config.LoggerConfig import logging
 
+logger = logging.getLogger(__name__)
 
 class YtdlpProvider:
     file_mover = FileMover()
     __dest_downloaded_video_path__ = ApplicationVariables().get("DEST_DOWNLOADED_VIDEO_PATH")
 
     def __init__(self):
-        print(" Selected => Download Youtube video \n")
         link = InputUtils.handle_user_url_input('youtube')
 
         if InputUtils.is_digit_and_go_back(link):
@@ -43,15 +44,17 @@ class YtdlpProvider:
                     # Step 3: Download using this info (won’t re-download if already done)
                     ytdlp.download(link)
 
-                    print(f"[DEBUG] Real saved path: {actual_file_path}")
+                    logger.debug(f"Real saved path: {actual_file_path}")
                 except DownloadError as de:
-                    print(f'Error downloading {link}: {str(de)}', end='\n')
+                    logger.error(f'Cannot download: {link} -> {str(de)}')
+                    
                     return
                 except Exception as e:
-                    print(f'Error: {repr(e)}', end='\n')
+                    logger.error(f'{repr(e)}')
+
                     return
                 
-            print(f"[DEBUG] Downloaded file: {actual_file_path}")
+            logger.debug(f"Downloaded file: {actual_file_path}")
                 
             # info = ytdlp.extract_info(link, download=False)
             YtdlpProvider.queue_for_audio_extraction(actual_file_path)
@@ -59,7 +62,7 @@ class YtdlpProvider:
             
     @staticmethod
     def queue_for_audio_extraction(filename):
-        print(' ------------------ Queue for audio extraction --------------------------')
+        print('\n\n                 ------------------ Queue for audio extraction --------------------------                 ')
         convert_answer = input(f"Do you want to queue '{filename}' for audio extraction? (yes(y) or no(n)): ")
             
         while convert_answer not in ("yes", "y", "no", "n"):

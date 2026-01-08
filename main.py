@@ -2,6 +2,9 @@ from Helpers.ConverterFactory import ConverterFactory
 from Helpers.DownloaderFactory import DownloaderFactory
 from Helpers.Utils import TitleBuilder
 from Helpers.Utils.DirectoryUtils import DirectoryUtils
+from config.LoggerConfig import logging
+
+logger = logging.getLogger(__name__)
 
 
 def menu_select(main_menu_option):
@@ -69,11 +72,11 @@ def menu():
 
         menu_select(option_selected)
 
-    print("Program exited.")
+    logger.info("Program exited.")
     return
 
 
 if __name__ == "__main__":
-    TitleBuilder.build_main_title('VIDEO DOWNLOADER AND CONVERTER')
     DirectoryUtils.create_folders()
+    TitleBuilder.build_main_title('VIDEO DOWNLOADER AND CONVERTER')
     menu()

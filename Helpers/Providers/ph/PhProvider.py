@@ -1,6 +1,9 @@
 from Helpers.Providers.ph.modules import pictureDownloader, videoDownloader
 from Helpers.Utils import TitleBuilder
 from Helpers.Utils.ApplicationVariables import ApplicationVariables
+from config.LoggerConfig import logging
+
+logger = logging.getLogger(__name__)
 
 
 class PhProvider:
@@ -40,4 +43,4 @@ class PhProvider:
             try:
                 menu_options[option]["function"]()
             except KeyError:
-                print('Invalid Option!', end='\n\n')
+                logger.error('Invalid Option!')

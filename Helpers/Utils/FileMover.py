@@ -2,6 +2,9 @@ import shutil
 from pathlib import Path
 
 from Helpers.Utils.ApplicationVariables import ApplicationVariables
+from config.LoggerConfig import logging
+
+logger = logging.getLogger(__name__)
 
 
 class FileMover:
@@ -16,10 +19,12 @@ class FileMover:
 
         is_coppied = FileMover.copy2(from_path, to_path)
 
+        print("\n")
+
         if is_coppied:
-            print(f"[FileMover] - Moving: Video -> {to_path} was added to the queue.")
+            logger.info(f"Moving video {to_path} to the queue.")
         else:
-            print("[FileMover] - Failed to move to queue. See error above.")
+            logger.error("It wans't possible to move to queue. See error above.")
 
         
     @staticmethod
@@ -28,12 +33,12 @@ class FileMover:
         to_path_converted = Path(to_path)
         
         if not from_path_converted.exists():   
-            print(f"[ERROR][FileMover] - Source file not found: {from_path}")
+            logger.error(f"Source file: {from_path} not found!")
             return False
         
         try:
             shutil.copy2(from_path_converted, to_path_converted)
             return True
         except Exception as ex:
-            print(f'[ERROR][FileMover] - {repr(ex)}')
+            logger.error(f"{repr(ex)}")
             return False

@@ -5,6 +5,9 @@ from Helpers.Utils.ApplicationVariables import ApplicationVariables
 from Helpers.Utils.CollectionsUtils import load_permitted_video_files_dic
 from Helpers.Utils.InputUtils import validate_return_user_input_choose
 from Helpers.Utils.MenuUtils import mount_menu_for_videos_to_convert
+from config.LoggerConfig import logging
+
+logger = logging.getLogger(__name__)
 
 
 class PydubConverter:
@@ -14,7 +17,8 @@ class PydubConverter:
     quantity_converted = 0
 
     def __init__(self):
-        print(" Selected => Convert a Youtube video to audio file \n")
+        logger.info("Selected => Convert a Youtube video to audio file")
+
         files_to_convert, total_files = load_permitted_video_files_dic()
 
         try:
@@ -23,7 +27,7 @@ class PydubConverter:
             self.process_convert_to_audio(option_selected, files_to_convert)
 
         except IndexError as ierr:
-            print(ierr)
+            logger.warning(ierr)
             return
 
     def process_convert_to_audio(self, user_option, video_files_dic):
@@ -31,29 +35,32 @@ class PydubConverter:
         is_converted_success = True
 
         if user_option == "all".lower():
-            print("Converting all file: ")
+            logger.info("Converting all file: ")
 
             for index in video_files_dic:
                 is_converted_success = self.__convert_to_audio__(
-                    self.queue_video_path, self.dest_converted_audio_path, video_files_dic, index)
+                    self.queue_video_path, self.dest_converted_audio_path, video_files_dic, index) # TODO: remove duplicatesremove duplicates
 
         elif user_option == "back".lower():
             return
         elif user_option.isdigit():
             index = int(user_option)
+
+            logger.info(f"Converting option: {index} and file: ")
+
             is_converted_success = self.__convert_to_audio__(
-                self.queue_video_path, self.dest_converted_audio_path, video_files_dic, index)
+                self.queue_video_path, self.dest_converted_audio_path, video_files_dic, index) # TODO: remove duplicatesremove duplicates
         else:
-            print("\nERROR: Not a valid option!")
+            logger.error("Not a valid option!")
+
             return
 
-        title_message = f"\n{
-            'SUCCESS!' if is_converted_success else 'FAILED!'} "
+        title_message = f"{'SUCCESS!' if is_converted_success else 'FAILED!'}"
         body_message = f"It was converted {
             self.quantity_converted} of total of {len(video_files_dic)} file"
         ending_message = f"{'s' if self.quantity_converted > 1 else ''}."
 
-        print(f"{title_message}{body_message}{ending_message}")
+        logger.info(f"{title_message}{body_message}{ending_message}")
 
     def __convert_to_audio__(self, from_file_path, dest_path, video_files_dic, index, format_type="mp3"):
         file = video_files_dic.get(index)
@@ -64,18 +71,19 @@ class PydubConverter:
         full_dest_file_path = dest_path + new_filename_without_extension
         full_from_file_path = from_file_path + file
 
-        print(f"\n\nConverting: {file}...")
+        logger.info(f"Converting: {file}...")
 
         try:
-            AudioSegment.from_file(full_from_file_path).export(full_dest_file_path + "." + format_type, format=format_type) # TODO: for yt-dlp provider there is an list out range error because of not gtting the audio stream only video, the problem is inside pydub lib
+            AudioSegment.from_file(full_from_file_path).export(full_dest_file_path + "." + format_type, format=format_type) # TODO: for yt-dlp provider there is an list out range error because of not getting the audio stream only video, the problem is inside pydub lib
             os.remove(full_from_file_path)
             self.quantity_converted += 1
 
             return True
         except FileNotFoundError:
-            print("\nERROR: The file was not found")
+            logger.error("The file was not found")
 
             return False
         except Exception as e:
-            print(f'ERROR: {repr(e)}')
+            logger.error(f"{repr(e)}")
+
             return False

@@ -2,8 +2,11 @@ import os
 import shutil
 import requests
 from bs4 import BeautifulSoup
-
+from config.LoggerConfig import logging
 from Helpers.Utils.ApplicationVariables import ApplicationVariables
+
+
+logger = logging.getLogger(__name__)
 
 __version__ = "1.0"
 __author__ = "FabioMassa"
@@ -35,7 +38,7 @@ def main():
             html = requests.get(i).text
             soup = BeautifulSoup(html, 'html.parser')
         except Exception as e:
-            print(e)
+            logger.error(e)
             continue
 
         try:
@@ -44,7 +47,8 @@ def main():
             img = soup.find("div", "centerImage").find(
                 "video").find("source")["src"]
         except AttributeError as ae:
-            print('Error: No img could be found! Message: ' + repr(ae))
+            logger.error(f"No img could be found! Message: {repr(ae)}")
+
             continue
 
         title = soup.title.text
@@ -63,8 +67,8 @@ def main():
         with open(abspath, 'wb') as f:
             shutil.copyfileobj(r.raw, f)
 
-        print(f" [+] Downloaded '{__dest_pictures_path__}/{title}/{album} - {i.split('/')[-1]}.{img.split(
-            '.')[-1]}', {indx}/{len(children)} - {indx / len(children) * 100:.2f}%   ", end="\r")
+        logger.info(f"[+] Downloaded '{__dest_pictures_path__}/{title}/{album} - {i.split('/')[-1]}.{img.split(
+            '.')[-1]}', {indx}/{len(children)} - {indx / len(children) * 100:.2f}%   ")
 
         indx += 1
 
