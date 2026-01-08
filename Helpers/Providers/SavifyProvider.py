@@ -3,11 +3,7 @@ from dotenv import load_dotenv, find_dotenv
 
 from Helpers.Utils import InputUtils
 from Helpers.Utils.ApplicationVariables import ApplicationVariables
-from modules.savify.logger import Logger
-from modules.savify.savify import Savify
-from modules.savify.spotify import Spotify
-from modules.savify.types import Type
-from modules.savify.utils import PathHolder
+from savify.savify import PathHolder, Savify, Spotify, Type
 from config.LoggerConfig import logging
 
 logger = logging.getLogger(__name__)
@@ -24,10 +20,9 @@ class SavifyProvider:
     __path_holder__ = PathHolder(downloads_path=__dest_converted_audio_path__)
     __api_credentials__ = (__CLIENT_ID__, __CLIENT_SECRET__)
 
-    __logger__ = Logger(log_location='./logs', log_level=20)
+    # __logger__ = Logger(log_location='./logs', log_level=20)
 
-    __savify__ = Savify(api_credentials=__api_credentials__,
-                        path_holder=__path_holder__, group='%artist%/%album%', logger=__logger__)
+    __savify__ = Savify(api_credentials=__api_credentials__, path_holder=__path_holder__, group='%artist%/%album%', logger=logger)
 
     def __init__(self) -> None:
         logger.warning("This is an experimental feature.")
@@ -41,7 +36,7 @@ class SavifyProvider:
 
         self.download(link)
 
-    def search(self, query, type: Type = Type.ARTIST):
+    def search(self, query, type: Type = Type.TRACK):
         spotify = Spotify(self.__api_credentials__)
 
         result_search = spotify.search(query, type, artist_albums=True)
@@ -52,5 +47,5 @@ class SavifyProvider:
 
     def download(self, url):
         logger.info("Downloading... (This can take few seconds/minutes)")
-        print("\n")
+
         self.__savify__.download(url)
