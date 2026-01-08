@@ -1,0 +1,29 @@
+[project]
+name = "python-stream-downloader-converter"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Fabio Massaretto",email = "fabio_no_more@yahoo.com.br"}
+]
+readme = "README.md"
+requires-python = "3.14.0"
+dependencies = [
+    "beautifulsoup4 (>=4.14.3,<5.0.0)",
+    "pydub (>=0.25.1,<0.26.0)",
+    "savify (>=2.3.4,<3.0.0)",
+    "youtube-dl (>=2021.12.17,<2022.0.0)",
+    "yt-dlp (>=2025.11.12,<2026.0.0)",
+    "python-dotenv (>=1.2.1,<2.0.0)",
+    "pytubefix (>=10.3.5,<11.0.0)",
+    "pytube2 (>=15.0.17,<16.0.0)",
+    "typing-extensions (>=4.15.0,<5.0.0)",
+    "pathvalidate (>=3.3.1,<4.0.0)",
+    "audioop-lts (>=0.2.2,<0.3.0)"
+]
+
+[tool.poetry]
+package-mode = false
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
