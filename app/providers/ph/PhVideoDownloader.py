@@ -1,14 +1,15 @@
 import re
-from Helpers.Utils.FileMover import FileMover
+from pathlib import Path
+from yt_dlp import YoutubeDL
+from app.helpers.utils.FileMover import FileMover
 from app.helpers.utils.ApplicationVariables import ApplicationVariables
 from app.providers.ph.PhDownloaderBase import PhDownloaderBase
-from yt_dlp import YoutubeDL
 from app.config.LoggerConfig import logging
 
 logger = logging.getLogger(__name__)
 
 
-class PhVideoProvider(PhDownloaderBase):
+class PhVideoDownloader(PhDownloaderBase):
     __dest_temp_ph_video_path__ = ApplicationVariables.get("DEST_TEMP_PH_VIDEO_PATH")
     __dest_downloaded_ph_video_path__ = ApplicationVariables.get("DEST_DOWNLOADED_PH_VIDEO_PATH")
 
@@ -35,10 +36,17 @@ class PhVideoProvider(PhDownloaderBase):
                 filename = re.sub('[^A-Za-z0-9 ]+', '', filename)
                 filename = filename.replace(' ', '-')
 
-                from_temp_path = f"{self.__dest_temp_ph_video_path__}/{temp_filename}.mp4"
-                to_final_path = f"{self.__dest_downloaded_ph_video_path__}/{filename}.mp4"
+                from_temp_path = Path(self.__dest_temp_ph_video_path__) / f"{temp_filename}.mp4"
+                to_final_path = Path(self.__dest_downloaded_ph_video_path__) / f"{filename}.mp4"
                 
                 FileMover.copy2(from_temp_path, to_final_path)
+                logger.info(f"Video downloaded and saved to: {to_final_path}")
 
+                logger.debug(f"Removing temp video from: {from_temp_path}")
+                FileMover.remove(from_temp_path)
+                logger.debug(f"Temp video removed!")
+
+            except FileNotFoundError as fnfe:
+                logger.error(str(fnfe))
             except Exception as e:
-                logger.error(f"Exception: {repr(e)}")
+                logger.error(str(e))

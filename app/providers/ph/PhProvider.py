@@ -1,9 +1,9 @@
 from app.helpers.utils.ApplicationVariables import ApplicationVariables
 from app.helpers.utils.ValidatorUtil import ValidatorUtil
 from app.providers.ProviderBase import ProviderBase
-from app.providers.ph.PhAlbumProvider import PhAlbumProvider
+from app.providers.ph.PhPhotoDownloader import PhPhotoDownloader
 from app.providers.ph.PhDownloaderBase import PhDownloaderBase
-from app.providers.ph.PhVideoProvider import PhVideoProvider
+from app.providers.ph.PhVideoDownloader import PhVideoDownloader
 
 class PhProvider(ProviderBase):
     __dest_temp_ph_video_path__ = ApplicationVariables.get("DEST_TEMP_PH_VIDEO_PATH")
@@ -17,10 +17,10 @@ class PhProvider(ProviderBase):
 
         for url in urls:
             if ValidatorUtil.is_ph_video_url(url):
-                ph_provider = PhVideoProvider()
+                ph_provider = PhVideoDownloader()
             elif ValidatorUtil.is_ph_album_url(url):
-                ph_provider = PhAlbumProvider()    
-                        
+                ph_provider = PhPhotoDownloader()    
+
             if ph_provider is None:
                 continue
             
