@@ -59,9 +59,10 @@ class ValidatorUtil():
         Returns:
             bool: True if the URL is valid for any provider, False otherwise.
         """
-        if url.startswith("http://www.youtube") or url.startswith("https://www.youtube") or url.startswith("www.youtube"):
+        if url.startswith("https://www.youtube") or url.startswith("www.youtube"):
             return True
-        elif url.startswith("https://open.spotify.com/") or url.startswith("http://www.spotify.com/") or url.startswith("open.spotify.com/"):
+        elif url.startswith("https://open.spotify.com/") or url.startswith("https://www.spotify.com/") or url.startswith("open.spotify.com/"):
             return True
+
         
         return False
