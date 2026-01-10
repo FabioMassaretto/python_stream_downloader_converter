@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class ProviveBase(ABC):
+class ProviderBase(ABC):
 
     @abstractmethod
     def download(self, urls: list[str]) -> None:

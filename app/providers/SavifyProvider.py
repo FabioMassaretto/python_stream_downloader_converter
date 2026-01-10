@@ -4,11 +4,12 @@ from dotenv import load_dotenv, find_dotenv
 from savify.savify import PathHolder, Savify
 from app.config.LoggerConfig import logging
 from app.helpers.utils.ApplicationVariables import ApplicationVariables
+from app.providers.ProviderBase import ProviderBase
 
 logger = logging.getLogger(__name__)
 
 
-class SavifyProvider:
+class SavifyProvider(ProviderBase):
     load_dotenv(find_dotenv())
 
     __dest_converted_audio_path__ = ApplicationVariables.get("DEST_CONVERTED_AUDIO_PATH")

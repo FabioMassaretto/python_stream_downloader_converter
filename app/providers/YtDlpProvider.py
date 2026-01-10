@@ -1,7 +1,7 @@
 from app.helpers.utils import FileMover
 from app.helpers.utils.ApplicationVariables import ApplicationVariables
 from app.helpers.utils.QueueUtil import QueueUtil
-from app.providers.ProviderBase import ProviveBase
+from app.providers.ProviderBase import ProviderBase
 from app.config.LoggerConfig import logging
 from yt_dlp import YoutubeDL, DownloadError
 from pathlib import Path
@@ -9,7 +9,7 @@ from pathlib import Path
 logger = logging.getLogger(__name__)
 
 
-class YtDlpProvider(ProviveBase):
+class YtDlpProvider(ProviderBase):
     file_mover: FileMover = FileMover
     __dest_downloaded_video_path__ = ApplicationVariables.get("DEST_DOWNLOADED_VIDEO_PATH")
 
