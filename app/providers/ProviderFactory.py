@@ -2,6 +2,7 @@ from app.providers import ProviderBase
 from app.providers.ProvidersEnum import ProvidersEnum
 from app.providers.YtDlpProvider import YtDlpProvider
 from app.providers.SavifyProvider import SavifyProvider
+from app.providers.ph.PhProvider import PhProvider
 
 
 class ProviderFactory:
@@ -11,5 +12,7 @@ class ProviderFactory:
             return YtDlpProvider()
         elif provider_name == ProvidersEnum.SAVIFY.value:
             return SavifyProvider()
-        else:
-            raise ValueError(f"Unknown provider: {provider_name}")
+        elif provider_name == ProvidersEnum.PH.value:
+            return PhProvider()
+
+        raise ValueError(f"Unknown provider: {provider_name}")

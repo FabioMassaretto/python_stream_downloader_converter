@@ -75,6 +75,7 @@ def providers_menu_build():
         provider = ProviderFactory.get_provider_instance('SAVIFY')
     elif PROVIDER_CHOICE == "3":
         console.print("\n\nYou selected to download a PH video or image.")
+        provider = ProviderFactory.get_provider_instance('PH')
             
     logger.debug(f"Starting download with provider: {provider.__class__.__name__}")
     provider.download(URLS)

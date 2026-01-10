@@ -21,7 +21,35 @@ class ValidatorUtil():
                 return False
         
         return True
+    
+    def is_ph_video_url(url: str) -> bool:
+        """Check if the URL is a valid PH video URL.
+
+        Args:
+            url (str): The URL to validate.
+        Returns:
+            bool: True if the URL is a valid PH video URL, False otherwise.
+        """
+        if url.find("view_video") != -1:
+            return True
+        
+        return False
+    
+    
+    def is_ph_album_url(url: str) -> bool:
+        """Check if the URL is a valid PH video URL.
+
+        Args:
+            url (str): The URL to validate.
+        Returns:
+            bool: True if the URL is a valid PH video URL, False otherwise.
+        """
+        if url.find("album") != -1:
+            return True
+        
+        return False
             
+
     def _is_url_valid_for_provider(url: str) -> bool:
         """Check if the URL is valid for any provider.
 
