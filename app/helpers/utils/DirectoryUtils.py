@@ -10,6 +10,7 @@ dest_downloaded_video_path = ApplicationVariables.get("DEST_DOWNLOADED_VIDEO_PAT
 dest_converted_audio_path = ApplicationVariables.get("DEST_CONVERTED_AUDIO_PATH")
 dest_temp_ph_video_path = ApplicationVariables.get("DEST_TEMP_PH_VIDEO_PATH")
 dest_downloaded_ph_video_path = ApplicationVariables.get("DEST_DOWNLOADED_PH_VIDEO_PATH")
+dest_pictures_path = ApplicationVariables.get("DEST_PICTURES_PATH")
 
 
 class DirectoryUtils:
@@ -38,5 +39,10 @@ class DirectoryUtils:
             logger.debug(f"Creating directory at: {dest_downloaded_ph_video_path}")
 
             os.makedirs(dest_downloaded_ph_video_path)
+
+        if not os.path.exists(dest_pictures_path):
+            logger.debug(f"Creating directory at: {dest_pictures_path}")
+
+            os.makedirs(dest_pictures_path)
 
         logger.debug("All necessary directories were created.")
