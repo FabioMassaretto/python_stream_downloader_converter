@@ -32,20 +32,29 @@ class FileMover():
         return [p for p in Path(FileMover.QUEUE_VIDEO_PATH).iterdir() if p.is_file() and (p.suffix in FileMover.VALID_VIDEO_EXTENSIONS)]
         
     @staticmethod
-    def copy2(from_path: str, to_path: str):
-        from_path_converted = Path(from_path)
-        to_path_converted = Path(to_path)
-        
-        if not from_path_converted.exists():   
+    def copy2(from_path: Path, to_path: Path) -> bool:
+        if not from_path.exists():   
             logger.error(f"Source file: {from_path} not found!")
 
-            return False
+            raise FileNotFoundError("Source file not found.")
         
         try:
-            shutil.copy2(from_path_converted, to_path_converted)
+            shutil.copy2(from_path, to_path)
 
             return True
         except Exception as ex:
             logger.error(f"{repr(ex)}")
 
-            return False
+            raise ex
+
+    @staticmethod
+    def remove(from_path: Path) -> None:
+        if not from_path.exists():   
+            logger.error(f"Source file: {from_path} not found!")
+
+            raise FileNotFoundError("Source file not found.")
+        
+        try:
+            from_path.unlink()
+        except Exception as ex:
+            raise ex
