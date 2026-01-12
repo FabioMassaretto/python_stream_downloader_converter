@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import List
 from rich.console import Console
 from app.converters.audio.PydubConverter import PydubConverter
 from app.extractors.audio.AudioExtractor import AudioExtractor
@@ -7,7 +8,7 @@ from app.helpers.utils.QueueUtil import QueueUtil
 from app.helpers.utils.ValidatorUtil import ValidatorUtil
 from app.providers import ProviderBase
 from app.providers.ProviderFactory import ProviderFactory
-from app.ui.menu import convertion_audio_menu, main_menu, provider_menu, read_urls
+from app.ui.menu import confirm_video_to_audio_extract, convertion_audio_menu, main_menu, provider_menu, read_urls
 from app.config.LoggerConfig import logging
 
 logger = logging.getLogger(__name__)
@@ -69,16 +70,32 @@ def providers_menu_build():
 
     if PROVIDER_CHOICE == "1":
         console.print("\n\nYou selected to download a Youtube video with yt-dlp.")
+
         provider = ProviderFactory.get_provider_instance('YTDLP')
     elif PROVIDER_CHOICE == "2":
         console.print("\n\nYou selected to download a Spotify audio with savify.")
+
         provider = ProviderFactory.get_provider_instance('SAVIFY')
     elif PROVIDER_CHOICE == "3":
         console.print("\n\nYou selected to download a PH video or image.")
+
         provider = ProviderFactory.get_provider_instance('PH')
             
     logger.debug(f"Starting download with provider: {provider.__class__.__name__}")
     provider.download(URLS)
+
+    has_video_to_convert: bool = len(QueueUtil.get_queue_list()) > 0
+    
+    if has_video_to_convert:
+        console.print("\nConfirm videos for audio extraction.")
+
+        videos_to_confirm_convert: List[Path] = QueueUtil.get_queue_list().copy()
+
+        for video in videos_to_confirm_convert:
+            if confirm_video_to_audio_extract(video) in ("yes", "y"):
+                QueueUtil.move_video_to_queue_folder(video)
+
+            QueueUtil.remove_from_queue_list(video)
 
 
 def progress_menu_build():
