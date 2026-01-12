@@ -18,7 +18,7 @@ class PhVideoDownloader(PhDownloaderBase):
 
     def download(self, url: str) -> None:
         options = {
-            'outtmpl': f'{self.__dest_temp_ph_video_path__}/%(id)s.%(ext)s',
+            'outtmpl': f'{str(self.__dest_temp_ph_video_path__.resolve())}/%(id)s.%(ext)s',
         }
 
         # If anyone knows how to mute the output of this send help :,)
@@ -36,8 +36,8 @@ class PhVideoDownloader(PhDownloaderBase):
                 filename = re.sub('[^A-Za-z0-9 ]+', '', filename)
                 filename = filename.replace(' ', '-')
 
-                from_temp_path = Path(self.__dest_temp_ph_video_path__) / f"{temp_filename}.mp4"
-                to_final_path = Path(self.__dest_downloaded_ph_video_path__) / f"{filename}.mp4"
+                from_temp_path = self.__dest_temp_ph_video_path__ / f"{temp_filename}.mp4"
+                to_final_path = self.__dest_downloaded_ph_video_path__ / f"{filename}.mp4"
                 
                 FileMover.copy2(from_temp_path, to_final_path)
                 logger.info(f"Video downloaded and saved to: {to_final_path}")

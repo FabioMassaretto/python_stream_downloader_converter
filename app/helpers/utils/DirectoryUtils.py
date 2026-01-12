@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from app.helpers.utils.ApplicationVariables import ApplicationVariables
 from app.config.LoggerConfig import logging
@@ -15,34 +16,34 @@ dest_pictures_path = ApplicationVariables.get("DEST_PICTURES_PATH")
 
 class DirectoryUtils:
     def create_folders():
-        if not os.path.exists(queue_video_path):
+        if not queue_video_path.exists():
             logger.debug(f"Creating directory at: {queue_video_path}")
 
-            os.makedirs(queue_video_path)
+            queue_video_path.mkdir(parents=True)
 
-        if not os.path.exists(dest_downloaded_video_path):
+        if not dest_downloaded_video_path.exists():
             logger.debug(f"Creating directory at: {dest_downloaded_video_path}")
 
-            os.makedirs(dest_downloaded_video_path)
+            dest_downloaded_video_path.mkdir(parents=True)
 
-        if not os.path.exists(dest_converted_audio_path):
+        if not dest_converted_audio_path.exists():
             logger.debug(f"Creating directory at: {dest_converted_audio_path}")
 
-            os.makedirs(dest_converted_audio_path)
+            dest_converted_audio_path.mkdir(parents=True)
 
-        if not os.path.exists(dest_temp_ph_video_path):
+        if not dest_temp_ph_video_path.exists():
             logger.debug(f"Creating directory at: {dest_temp_ph_video_path}")
 
-            os.makedirs(dest_temp_ph_video_path)
+            dest_temp_ph_video_path.mkdir(parents=True)
 
-        if not os.path.exists(dest_downloaded_ph_video_path):
+        if not dest_downloaded_ph_video_path.exists():
             logger.debug(f"Creating directory at: {dest_downloaded_ph_video_path}")
 
-            os.makedirs(dest_downloaded_ph_video_path)
+            dest_downloaded_ph_video_path.mkdir(parents=True)
 
-        if not os.path.exists(dest_pictures_path):
+        if not dest_pictures_path.exists():
             logger.debug(f"Creating directory at: {dest_pictures_path}")
 
-            os.makedirs(dest_pictures_path)
+            dest_pictures_path.mkdir(parents=True)
 
         logger.debug("All necessary directories were created.")

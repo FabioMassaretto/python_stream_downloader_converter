@@ -18,7 +18,7 @@ class YtDlpProvider(ProviderBase):
         'windowsfilenames': True,
         'check_formats': 'selected',
         # 'progress_hooks': [my_hook],
-        'paths': {'home': __dest_downloaded_video_path__ },
+        'paths': {'home': str(__dest_downloaded_video_path__.resolve()) },
         'format': 'bv[height>=720]+ba[ext=m4a]/best[height>=720]'
     }
 
@@ -47,5 +47,5 @@ class YtDlpProvider(ProviderBase):
                     
                     logger.debug(f"Downloaded file: {actual_file_path}")
                     
-                    QueueUtil.put_video_in_audio_extract_queue(actual_file_path)
+                    QueueUtil.put_in_queue_list(actual_file_path)
 

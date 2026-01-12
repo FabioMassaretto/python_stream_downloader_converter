@@ -17,7 +17,7 @@ class SavifyProvider(ProviderBase):
     __CLIENT_ID__ = os.environ.get("CLIENT_ID")
     __CLIENT_SECRET__ = os.environ.get("CLIENT_SECRET")
 
-    __path_holder__ = PathHolder(downloads_path=__dest_converted_audio_path__)
+    __path_holder__ = PathHolder(downloads_path=str(__dest_converted_audio_path__.resolve()))
     __api_credentials__ = (__CLIENT_ID__, __CLIENT_SECRET__)
 
     __savify__ = Savify(api_credentials=__api_credentials__, path_holder=__path_holder__, group='%artist%/%album%', logger=logger)

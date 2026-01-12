@@ -14,9 +14,7 @@ class FileMover():
     
     @staticmethod
     def move_to_queue_dir(from_path: Path):
-        queue_folder_path = FileMover.QUEUE_VIDEO_PATH
-
-        to_path = Path(queue_folder_path) / from_path.name
+        to_path = FileMover.QUEUE_VIDEO_PATH / from_path.name
 
         is_coppied = FileMover.copy2(from_path, to_path)
 

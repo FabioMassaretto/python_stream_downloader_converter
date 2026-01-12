@@ -24,14 +24,15 @@ class PydubConverter(AudioConverter):
 
     def __convert_to_audio__(self, videos_path: list[Path], format_type: str = "mp3"):
         for video_path in videos_path:
-            full_from_file_path = Path(self.queue_video_path) / video_path.name
-            full_dest_file_path = Path(self.dest_converted_audio_path) / f"{video_path.stem}.{format_type}"
+            full_from_file_path = self.queue_video_path / video_path.name
+            full_dest_file_path = self.dest_converted_audio_path / f"{video_path.stem}.{format_type}"
 
             logger.info(f"Converting: {video_path.name}...")
 
             try:
                 AudioSegment.from_file(full_from_file_path).export(full_dest_file_path, format=format_type)
                 FileMover.remove(video_path)
+
                 self.quantity_converted += 1
 
             except FileNotFoundError as fnfe:
