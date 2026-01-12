@@ -1,0 +1,52 @@
+import re
+from pathlib import Path
+from yt_dlp import YoutubeDL
+from app.helpers.utils.FileMover import FileMover
+from app.helpers.utils.ApplicationVariables import ApplicationVariables
+from app.providers.ph.PhDownloaderBase import PhDownloaderBase
+from app.config.LoggerConfig import logging
+
+logger = logging.getLogger(__name__)
+
+
+class PhVideoDownloader(PhDownloaderBase):
+    __dest_temp_ph_video_path__ = ApplicationVariables.get("DEST_TEMP_PH_VIDEO_PATH")
+    __dest_downloaded_ph_video_path__ = ApplicationVariables.get("DEST_DOWNLOADED_PH_VIDEO_PATH")
+
+    def __init__(self):
+        super().__init__()
+
+    def download(self, url: str) -> None:
+        options = {
+            'outtmpl': f'{str(self.__dest_temp_ph_video_path__.resolve())}/%(id)s.%(ext)s',
+        }
+
+        # If anyone knows how to mute the output of this send help :,)
+        ydl = YoutubeDL(options)
+        with ydl:
+            try:
+                result = ydl.extract_info(
+                    url,
+                    download=True
+                )
+
+                temp_filename = result['id']
+
+                filename = f'{result['uploader']} - {result['title']} - {result['id']}'
+                filename = re.sub('[^A-Za-z0-9 ]+', '', filename)
+                filename = filename.replace(' ', '-')
+
+                from_temp_path = self.__dest_temp_ph_video_path__ / f"{temp_filename}.mp4"
+                to_final_path = self.__dest_downloaded_ph_video_path__ / f"{filename}.mp4"
+                
+                FileMover.copy2(from_temp_path, to_final_path)
+                logger.info(f"Video downloaded and saved to: {to_final_path}")
+
+                logger.debug(f"Removing temp video from: {from_temp_path}")
+                FileMover.remove(from_temp_path)
+                logger.debug(f"Temp video removed!")
+
+            except FileNotFoundError as fnfe:
+                logger.error(str(fnfe))
+            except Exception as e:
+                logger.error(str(e))
