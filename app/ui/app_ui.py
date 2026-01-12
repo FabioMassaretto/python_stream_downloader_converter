@@ -1,6 +1,5 @@
 from rich.console import Console
 from rich.panel import Panel
-
 from app.ui.menu import main_menu
 
 
