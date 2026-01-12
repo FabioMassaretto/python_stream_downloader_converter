@@ -6,9 +6,6 @@ from app.providers.ph.PhDownloaderBase import PhDownloaderBase
 from app.providers.ph.PhVideoDownloader import PhVideoDownloader
 
 class PhProvider(ProviderBase):
-    __dest_temp_ph_video_path__ = ApplicationVariables.get("DEST_TEMP_PH_VIDEO_PATH")
-    __dest_downloaded_ph_video_path__ = ApplicationVariables.get("DEST_DOWNLOADED_PH_VIDEO_PATH")
-
     def __init__(self):
         super().__init__()
 
