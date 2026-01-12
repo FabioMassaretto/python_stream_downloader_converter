@@ -63,6 +63,7 @@ class ValidatorUtil():
             return True
         elif url.startswith("https://open.spotify.com/") or url.startswith("https://www.spotify.com/") or url.startswith("open.spotify.com/"):
             return True
-
+        elif url.startswith("https://www.othersite.com/") or url.startswith("www.othersite.com/") or url.startswith("othersite.com/"):
+            return True
         
         return False
