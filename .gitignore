@@ -166,3 +166,4 @@ Scripts/
 how-to-fix-savity-ytdl-error.txt
 .vscode
 pyvenv.cfg
+*.log*
