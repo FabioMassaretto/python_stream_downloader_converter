@@ -26,7 +26,8 @@ class YtdlpProvider:
         'check_formats': 'selected',
         # 'progress_hooks': [my_hook],
         'paths': {'home': __dest_downloaded_video_path__ },
-        'format': 'bestvideo[height=1080][ext=mp4]+bestaudio[ext=m4a]/best[height<=1080]'
+        'format': 'bv[height>=720]+ba[ext=m4a]/best[height>=720]',
+        # 'format': 'bestvideo[height>=1080][ext=mp4]+bestaudio[ext=m4a]/best[height>=720]'
         # 'format': "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best",
         # 'format': "(bv*[vcodec~='^((he|a)vc|h26[45])']+ba) / (bv*+ba/b)",
         # 'format': "bestvideo[height>=720]best[ext=mp4]",
