@@ -4,6 +4,8 @@ from Helpers.Utils import TitleBuilder
 from Helpers.Utils.DirectoryUtils import DirectoryUtils
 from config.LoggerConfig import logging
 
+from app.main import main
+
 logger = logging.getLogger(__name__)
 
 
@@ -77,6 +79,13 @@ def menu():
 
 
 if __name__ == "__main__":
-    DirectoryUtils.create_folders()
-    TitleBuilder.build_main_title('VIDEO DOWNLOADER AND CONVERTER')
-    menu()
+    ## Deprecated project, use the app/main.py instead
+    #
+    # DirectoryUtils.create_folders()
+    # TitleBuilder.build_main_title('VIDEO DOWNLOADER AND CONVERTER')
+    # menu()
+    #
+    ## End deprecated project
+
+    logger.warning("Deprecated main.py executed. Use app/main.py instead.") 
+    main()
