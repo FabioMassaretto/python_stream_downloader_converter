@@ -8,6 +8,7 @@ from app.helpers.utils.QueueUtil import QueueUtil
 from app.providers.ProviderBase import ProviderBase
 from app.config.LoggerConfig import logging
 from yt_dlp import YoutubeDL, DownloadError
+from yt_dlp.networking.impersonate import ImpersonateTarget
 from pathlib import Path
 
 try:
@@ -37,14 +38,23 @@ class YtDlpProvider(ProviderBase):
     retry_strategies: list[dict] = [
         {},  # first attempt: plain base options
         {'extractor_args': {'youtube': {'player_client': ['android']}}},
-        {'extractor_args': {}, 'impersonate': 'Edge'},
+        {'impersonate': ImpersonateTarget('edge', os='windows') },
+        {'cookiesfrombrowser': ['firefox']},
+        {'cookies ': '/cookies/cookie.txt'},
     ]
 
     def download(self, urls: list[str]) -> None:
         for url in urls:
-            self._download_single(url)
+            self.ydl_options = {}
 
-    def _download_single(self, url: str) -> None:
+            if ('playlist' in url) or ('list=' in url):
+                logger.debug(f"Processing playlist URL: {url}")
+                self.handle_playlist(url)
+            else:
+                logger.debug(f"Processing single video URL: {url}")
+                self.handle_single_video(url)
+
+    def handle_playlist(self, url: str) -> None:
         for attempt, overlay in enumerate(self.retry_strategies):
             # Fresh copy each attempt so nothing leaks between URLs/attempts.
             ydl_options = copy.deepcopy(self.base_ydl_opts)
@@ -52,22 +62,60 @@ class YtDlpProvider(ProviderBase):
 
             try:
                 with YoutubeDL(ydl_options) as ytdlp:
-                    # Step 1: Extract info BEFORE download to get metadata
+                    info = ytdlp.extract_info(url, download=False)
+
+                    if info.get("_type") == "playlist" and info.get("entries"):
+                        for entry in info.get("entries"):
+                            entry_url = entry.get("webpage_url")
+                            logger.debug(f"Processing playlist entry: {entry_url}")
+                            self.handle_single_video(entry_url, entry)
+
+            except DownloadError as de:
+                logger.error(f'Cannot download: {url} -> {str(de)}')
+
+                if attempt < len(self.retry_strategies) - 1:
+                    logger.warning(
+                        f"Retrying download for: {url} "
+                        f"(attempt {attempt + 2}/{len(self.retry_strategies)})"
+                    )
+                    continue  # try next strategy for this same URL
+                else:
+                    logger.error(f"All retry strategies exhausted for: {url}")
+                    return  # give up on this URL only, move on to the next one
+            except YoutubeDLError as yde:
+                logger.error(f'{repr(yde)}')
+
+                return
+            except Exception as e:
+                logger.error(f'{repr(e)}')
+
+                return
+
+    def handle_single_video(self, url: str) -> None:
+        for attempt, overlay in enumerate(self.retry_strategies):
+            # Fresh copy each attempt so nothing leaks between URLs/attempts.
+            ydl_options = copy.deepcopy(self.base_ydl_opts)
+            ydl_options.update(copy.deepcopy(overlay))
+
+            try:
+                with YoutubeDL(ydl_options) as ytdlp:
                     info = ytdlp.extract_info(url, download=False)
 
                     # dynamic format selection
+                    # Step 1: Select the best audio and video format based on the extracted info
                     best_format = self.select_best_format(info.get("formats", []))
                     logger.debug(f"Selected format: {best_format}")
 
                     ytdlp.params["format"] = best_format
 
-                    # Step 2: Get the actual file name yt_dlp will save to
-                    actual_file_path = Path(ytdlp.prepare_filename(info))
-
-                    # Step 3: Download using this info (won’t re-download if already done)
+                    # Step 2: Download using this info (won’t re-download if already done)
                     ytdlp.download([url])
 
-                    logger.debug(f"Real saved path: {actual_file_path}")
+                    # Step 3: Move the successful downloaded video to the queue folder
+                    actual_file_path = Path(ytdlp.prepare_filename(info))
+                    logger.debug(f"Video path saved location: {actual_file_path}")
+                    QueueUtil.put_in_queue_list(actual_file_path)
+
             except DownloadError as de:
                 logger.error(f'Cannot download: {url} -> {str(de)}')
  
@@ -88,11 +136,11 @@ class YtDlpProvider(ProviderBase):
                 logger.error(f'{repr(e)}')
 
                 return
-            else:
-                # Success — record result and stop retrying this URL
-                logger.debug(f"Downloaded file: {actual_file_path}")
-                QueueUtil.put_in_queue_list(actual_file_path)
-                return
+            # else:
+            #     # Success — record result and stop retrying this URL
+            #     logger.debug(f"Downloaded file: {actual_file_path}")
+            #     QueueUtil.put_in_queue_list(actual_file_path)
+            #     return
             
 
     def select_best_format(self, formats: list[dict]) -> str:
