@@ -6,7 +6,7 @@ authors = [
     {name = "Fabio Massaretto",email = "fabio_no_more@yahoo.com.br"}
 ]
 readme = "README.md"
-requires-python = "3.14.1"
+requires-python = ">=3.14.0"
 dependencies = [
     "beautifulsoup4 (>=4.14.3,<5.0.0)",
     "pydub (>=0.25.1,<0.26.0)",
