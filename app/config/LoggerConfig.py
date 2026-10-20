@@ -42,3 +42,8 @@ root_logger = logging.getLogger()
 root_logger.setLevel(logging.DEBUG)
 # Replace existing handlers to avoid duplicates
 root_logger.handlers = [rich_handler, file_handler]
+
+# Suppress noisy subprocess/ffmpeg output from pydub
+logging.getLogger("pydub.utils").setLevel(logging.WARNING)
+logging.getLogger("pydub.converter").setLevel(logging.WARNING)
+logging.getLogger("pydub").setLevel(logging.WARNING)
