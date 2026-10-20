@@ -57,13 +57,27 @@ class ValidatorUtil():
             url (str): The URL to validate.
 
         Returns:
-            bool: True if the URL is valid for any provider, False otherwise.
+            bool: True if the URL is valid, False otherwise.
         """
-        if url.startswith("https://www.youtube") or url.startswith("www.youtube"):
+        youtube_prefixes = (
+            "https://www.youtube.",
+            "https://youtube.",
+            "http://www.youtube.",
+            "http://youtube.",
+            "www.youtube.",
+            "youtube.",
+            "https://m.youtube.",
+            "http://m.youtube.",
+            "m.youtube.",
+            "https://youtu.be",
+            "http://youtu.be",
+            "youtu.be",
+        )
+        if any(url.startswith(prefix) for prefix in youtube_prefixes):
             return True
         elif url.startswith("https://open.spotify.com/") or url.startswith("https://www.spotify.com/") or url.startswith("open.spotify.com/"):
             return True
-        elif url.startswith("https://www.othersite.com/") or url.startswith("www.othersite.com/") or url.startswith("othersite.com/"):
+        elif url.startswith("https://www.pornhub.com/") or url.startswith("www.pornhub.com/") or url.startswith("pornhub.com/"):
             return True
         
         return False
