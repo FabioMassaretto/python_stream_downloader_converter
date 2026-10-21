@@ -1,0 +1,9 @@
+# Core dependencies (always required)
+mutagen>=1.47
+musicbrainzngs>=0.7
+pathvalidate>=3.0
+rich>=13.0
+
+# Optional: audio fingerprinting via AcoustID
+# Requires the 'fpcalc' binary from https://acoustid.org/chromaprint
+# pyacoustid>=1.3
