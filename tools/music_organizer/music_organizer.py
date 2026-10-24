@@ -47,13 +47,13 @@ from rich.progress import (
     TimeRemainingColumn,
 )
 from rich.table import Table
-from rich.text import Text
 
 # ── Make the package importable when run as a script ──────────────────────────
 sys.path.insert(0, str(Path(__file__).parent))
 
 from organizer.scanner import scan
 from organizer.models import SongInfo
+from organizer.utils import safe_display
 from organizer.file_organizer import FileMode, organize_file, resolve_metadata
 
 console = Console(highlight=False, emoji=False, legacy_windows=False)
@@ -91,7 +91,7 @@ def process_file(
     Returns (src, info, dest, status)  where status is one of:
         "ok" | "skipped" | "unresolved" | "error"
     """
-    display = (src.name[:40] + "...") if len(src.name) > 43 else src.name
+    display = safe_display(src.name)
     task = file_progress.add_task(f"[cyan]{display}[/cyan]", total=None)
 
     try:
@@ -141,18 +141,19 @@ def print_summary(
     table.add_column("Status", justify="center", ratio=1)
 
     for src, info, dest, status in sorted(results, key=lambda r: r[0].name.lower()):
+        src_disp = safe_display(src.name)
         if status == "ok":
             dest_str = str(dest.relative_to(dest.parents[2])) if dest else ""
             table.add_row(
-                src.name,
-                str(info),
-                dest_str,
+                src_disp,
+                safe_display(str(info)),
+                safe_display(dest_str),
                 f"[green]{action}[/green]",
             )
         elif status == "unresolved":
-            table.add_row(src.name, "—", "left in place", "[yellow]Skipped[/yellow]")
+            table.add_row(src_disp, "—", "left in place", "[yellow]Skipped[/yellow]")
         else:
-            table.add_row(src.name, "—", "—", "[red]Error[/red]")
+            table.add_row(src_disp, "—", "—", "[red]Error[/red]")
 
     console.print()
     console.print(table)
@@ -236,7 +237,15 @@ def main() -> None:
         )
     )
 
-    files = scan(input_dir, recursive=recursive)
+    # Exclude output_root if inside input_dir
+    exclude = []
+    try:
+        if output_root.is_relative_to(input_dir):
+            exclude.append(output_root)
+    except Exception:
+        pass
+
+    files = scan(input_dir, recursive=recursive, exclude_dirs=exclude)
 
     if not files:
         console.print("[yellow]No audio files found.[/yellow]")
@@ -283,13 +292,14 @@ def main() -> None:
                     result = future.result()
                     results.append(result)
                     src, info, dest, status = result
+                    disp = safe_display(src.name)
                     if status == "ok":
                         verb = "Would copy" if dry_run else mode.value.capitalize() + "d"
-                        console.print(f"[bold green][OK][/bold green] {verb}: [dim]{src.name}[/dim]")
+                        console.print(f"[bold green][OK][/bold green] {verb}: [dim]{disp}[/dim]")
                     elif status == "unresolved":
-                        console.print(f"[yellow][SKIP][/yellow] Unresolved: [dim]{src.name}[/dim]")
+                        console.print(f"[yellow][SKIP][/yellow] Unresolved: [dim]{disp}[/dim]")
                     else:
-                        console.print(f"[bold red][FAIL][/bold red] {src.name}")
+                        console.print(f"[bold red][FAIL][/bold red] {disp}")
                 except Exception as exc:
                     src = futures[future]
                     log.error(f"Worker crashed for {src.name}: {exc}")
