@@ -22,10 +22,10 @@ from rich.progress import (
     TimeRemainingColumn,
 )
 
-from organizer.scanner import scan
-from organizer.models import SongInfo
-from organizer.utils import safe_display
-from organizer.file_organizer import FileMode, organize_file, resolve_metadata
+from tools.music_organizer.organizer.models import SongInfo
+from tools.music_organizer.organizer.utils import safe_display
+from tools.music_organizer.organizer.file_organizer import FileMode, organize_file, resolve_metadata
+from tools.music_organizer.organizer.scanner import scan
 
 logger = logging.getLogger(__name__)
 
