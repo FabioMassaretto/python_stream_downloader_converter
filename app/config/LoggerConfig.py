@@ -1,8 +1,18 @@
+import sys
 import logging
 from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path
 from rich.console import Console
 from rich.logging import RichHandler
+
+if sys.platform == "win32":
+    try:
+        if hasattr(sys.stdout, "reconfigure"):
+            sys.stdout.reconfigure(encoding="utf-8")
+        if hasattr(sys.stderr, "reconfigure"):
+            sys.stderr.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
 
 LOG_FILE = './app/logs/app.log'
 BACKUP_COUNT = 1  # Keep 1 day of backups
@@ -11,7 +21,7 @@ INTERVAL = 1      # Rotate every 1 day
 
 Path(LOG_FILE).parent.mkdir(parents=True, exist_ok=True)
 
-console = Console()
+console = Console(legacy_windows=False)
 
 rich_handler = RichHandler(
     console=console,
