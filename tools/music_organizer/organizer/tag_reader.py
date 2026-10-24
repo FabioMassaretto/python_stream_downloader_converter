@@ -1,8 +1,11 @@
 """Read embedded tags from audio files using mutagen."""
+import logging
 from pathlib import Path
 from typing import Optional
 
-from organizer.models import SongInfo
+from tools.music_organizer.organizer.models import SongInfo
+
+logger = logging.getLogger(__name__)
 
 try:
     import mutagen
@@ -75,3 +78,40 @@ def read_tags(path: Path) -> Optional[SongInfo]:
         year=year,
         source="tags",
     )
+
+
+def write_tags(path: Path, info: SongInfo) -> bool:
+    """
+    Write known metadata from SongInfo into the file's embedded tags.
+    Supports MP3, FLAC, M4A, OGG, etc. via mutagen easy tags.
+    """
+    if not HAS_MUTAGEN:
+        return False
+
+    try:
+        audio = MutagenFile(path, easy=True)
+        if audio is None:
+            return False
+
+        if audio.tags is None:
+            try:
+                audio.add_tags()
+            except Exception:
+                pass
+
+        if info.artist:
+            audio["artist"] = [info.artist]
+        if info.album:
+            audio["album"] = [info.album]
+        if info.title:
+            audio["title"] = [info.title]
+        if info.year:
+            audio["date"] = [str(info.year)]
+        if info.track_number:
+            audio["tracknumber"] = [str(info.track_number)]
+
+        audio.save()
+        return True
+    except Exception as exc:
+        logger.debug(f"Failed to write tags to {path.name}: {exc}")
+        return False

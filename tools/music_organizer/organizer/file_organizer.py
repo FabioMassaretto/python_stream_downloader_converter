@@ -8,10 +8,11 @@ from enum import Enum
 from pathlib import Path
 from typing import Optional
 
-from organizer.models import SongInfo
-from organizer.tag_reader import read_tags
-from organizer.filename_parser import parse_filename
-from organizer import online_lookup
+from tools.music_organizer.organizer.models import SongInfo
+from tools.music_organizer.organizer.tag_reader import read_tags, write_tags
+from tools.music_organizer.organizer.filename_parser import parse_filename
+from tools.music_organizer.organizer.utils import safe_display
+from tools.music_organizer.organizer import online_lookup
 
 logger = logging.getLogger(__name__)
 
@@ -49,50 +50,71 @@ def resolve_metadata(
     use_online: bool = True,
 ) -> Optional[SongInfo]:
     """
-    Try, in order:
-      1. Embedded tags (mutagen)
-      2. AcoustID fingerprint  (if fpcalc available)
-      3. MusicBrainz text search  (if tags / filename gave us a hint)
-      4. Filename parsing
-    Returns None only if absolutely nothing useful was found.
+    Resolve song metadata using embedded tags, online lookup (iTunes & MusicBrainz),
+    and filename parsing.
+
+    Resolution order:
+      1. Embedded tags (mutagen) - if artist, title, AND album are present, return immediately.
+      2. Combine with filename parsing hints.
+      3. If album or artist is missing and use_online is True:
+         a. AcoustID audio fingerprinting (if available and file > 1MB).
+         b. Online search (iTunes Search API first, MusicBrainz fallback).
+            If found, official artist, album, title, year, and track number are used.
+      4. If online search fails or is disabled:
+         - If artist and title are known, keep album=None (placed in "Unknown Album").
+         - If artist or title cannot be identified, return None (file left as-is).
     """
     # Step 1 – embedded tags
     info = read_tags(path)
     if info and info.is_organizable and info.album:
-        logger.debug(f"[tags-complete] {path.name}")
+        logger.debug(f"[tags-complete] {safe_display(path.name)}")
         return info
 
-    # Step 2 – AcoustID (audio fingerprint) – only if file is big enough (>1 MB)
+    # Step 2 – filename hint
+    fn_info = parse_filename(path)
+    if not info:
+        info = fn_info
+    elif fn_info:
+        info = _merge(info, fn_info)
+
+    # Step 3 – AcoustID (audio fingerprint) – only if file is big enough (>1 MB)
     if use_online and path.stat().st_size > 1_000_000:
         acoustid_info = online_lookup.lookup_by_acoustid(path)
         if acoustid_info:
             info = _merge(info, acoustid_info)
             if info and info.is_organizable and info.album:
-                logger.debug(f"[acoustid-complete] {path.name}")
+                logger.debug(f"[acoustid-complete] {safe_display(path.name)}")
                 return info
 
-    # Step 3 – MusicBrainz text search using whatever we know so far
-    if use_online:
-        # Build hint: prefer tags, then fall back to filename
-        hint = info or parse_filename(path)
-        if hint and (hint.artist or hint.title):
-            mb_info = online_lookup.lookup_by_text(hint.artist, hint.title)
-            if mb_info:
-                info = _merge(info, mb_info)
-                if info and info.is_organizable:
-                    logger.debug(f"[musicbrainz] {path.name}")
-                    return info
+    # Step 4 – Online lookup via iTunes & MusicBrainz
+    if use_online and info and (info.artist or info.title):
+        online_info = online_lookup.lookup_online(info.artist, info.title)
+        if online_info:
+            # Prefer clean official metadata from online lookup
+            if online_info.album:
+                info.album = online_info.album
+            if online_info.artist:
+                info.artist = online_info.artist
+            if online_info.title:
+                info.title = online_info.title
+            if online_info.year and not info.year:
+                info.year = online_info.year
+            if online_info.track_number and not info.track_number:
+                info.track_number = online_info.track_number
+            info.source = online_info.source
+            logger.debug(f"[{online_info.source}-complete] {safe_display(path.name)} -> {info}")
+            return info
 
-    # Step 4 – filename parsing as last resort
-    fn_info = parse_filename(path)
-    if fn_info:
-        info = _merge(info, fn_info)
-
+    # Step 5 – Fallback check
+    # If we have both artist and title, but no album could be found anywhere:
+    # return info with album=None (will be routed to "Unknown Album")
     if info and info.is_organizable:
-        logger.debug(f"[filename] {path.name}")
+        logger.debug(f"[fallback-artist-title] {safe_display(path.name)} -> {info}")
         return info
 
-    logger.debug(f"[unresolvable] {path.name}")
+    # If neither artist nor title could be found (not a song or unidentifiable):
+    # return None so the file is left untouched as-is.
+    logger.debug(f"[unresolvable] {safe_display(path.name)}")
     return None
 
 
@@ -107,6 +129,7 @@ def organize_file(
 ) -> Optional[Path]:
     """
     Copy or move *src* to its organised destination.
+    Also embeds resolved metadata tags into the destination file.
     Returns the destination path, or None on failure.
     """
     dest = info.dest_path(output_root, src.suffix.lower())
@@ -133,5 +156,11 @@ def organize_file(
         except Exception as exc:
             logger.error(f"Failed to {mode.value} {src.name} → {dest}: {exc}")
             return None
+
+        # Embed resolved tags into destination file
+        try:
+            write_tags(dest, info)
+        except Exception as exc:
+            logger.debug(f"Could not embed ID3 tags into {dest.name}: {exc}")
 
     return dest

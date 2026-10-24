@@ -1,6 +1,6 @@
 """Scan a directory tree and return all audio file paths."""
 from pathlib import Path
-from typing import Iterator
+from typing import Optional
 
 AUDIO_EXTENSIONS: frozenset[str] = frozenset(
     {
@@ -10,11 +10,22 @@ AUDIO_EXTENSIONS: frozenset[str] = frozenset(
 )
 
 
-def scan(directory: Path, recursive: bool = True) -> list[Path]:
-    """Return a sorted list of audio files found under *directory*."""
+def scan(
+    directory: Path,
+    recursive: bool = True,
+    exclude_dirs: Optional[list[Path]] = None,
+) -> list[Path]:
+    """Return a sorted list of audio files found under *directory*, skipping *exclude_dirs*."""
     pattern = "**/*" if recursive else "*"
-    files = [
-        p for p in directory.glob(pattern)
-        if p.is_file() and p.suffix.lower() in AUDIO_EXTENSIONS
-    ]
+    resolved_excludes = [e.resolve() for e in (exclude_dirs or [])]
+
+    files = []
+    for p in directory.glob(pattern):
+        if not (p.is_file() and p.suffix.lower() in AUDIO_EXTENSIONS):
+            continue
+        p_resolved = p.resolve()
+        if any(p_resolved == ex or ex in p_resolved.parents for ex in resolved_excludes):
+            continue
+        files.append(p)
+
     return sorted(files)
