@@ -7,8 +7,9 @@ from anywhere in the app, and provides convenience functions.
 import sys
 from pathlib import Path
 from typing import Optional
-
 from tools.music_organizer.organizer.api import organize_directory, organize_files
+from app.helpers.utils.ApplicationVariables import ApplicationVariables  # noqa: E402
+from app.config.LoggerConfig import logging, console  # noqa: E402
 
 # Ensure project root and organizer root are in sys.path
 _PROJECT_ROOT = Path(__file__).resolve().parents[3]
@@ -19,8 +20,6 @@ _ORGANIZER_ROOT = _PROJECT_ROOT / "tools" / "music_organizer"
 if str(_ORGANIZER_ROOT) not in sys.path:
     sys.path.insert(0, str(_ORGANIZER_ROOT))
 
-from app.helpers.utils.ApplicationVariables import ApplicationVariables  # noqa: E402
-from app.config.LoggerConfig import logging, console  # noqa: E402
 
 logger = logging.getLogger(__name__)
 
@@ -71,7 +70,7 @@ def organize_specific_files(
     Output defaults to ``<converted_audio_path>/organized``.
     """
     if output_dir is None:
-        output_dir = _CONVERTED_AUDIO_PATH / "organized"
+        output_dir = _CONVERTED_AUDIO_PATH / "organized" / "library"
 
     return organize_files(
         files=files,
