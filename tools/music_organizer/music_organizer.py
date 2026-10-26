@@ -54,7 +54,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from organizer.scanner import scan
 from organizer.models import SongInfo
 from organizer.utils import safe_display
-from organizer.file_organizer import FileMode, organize_file, resolve_metadata
+from organizer.file_organizer import FileMode, organize_file, organize_unrecognized_file, resolve_metadata
 
 console = Console(highlight=False, emoji=False, legacy_windows=False)
 
@@ -99,7 +99,8 @@ def process_file(
 
         if not info or not info.is_organizable:
             file_progress.update(task, description=f"[yellow]{display}[/yellow]")
-            return src, info, None, "unresolved"
+            dest = organize_unrecognized_file(src, output_root, mode=mode, dry_run=dry_run)
+            return src, info, dest, "unresolved"
 
         dest = organize_file(src, info, output_root, mode=mode, dry_run=dry_run)
 
@@ -151,7 +152,13 @@ def print_summary(
                 f"[green]{action}[/green]",
             )
         elif status == "unresolved":
-            table.add_row(src_disp, "—", "left in place", "[yellow]Skipped[/yellow]")
+            dest_str = "Unrecognized/" + src.name if dest else "Unrecognized"
+            table.add_row(
+                src_disp,
+                "—",
+                safe_display(dest_str),
+                f"[yellow]{action} to Unrecognized[/yellow]",
+            )
         else:
             table.add_row(src_disp, "—", "—", "[red]Error[/red]")
 
@@ -160,7 +167,7 @@ def print_summary(
     console.print()
     console.print(
         f"[bold green]{len(ok)} organised[/bold green]  "
-        f"[yellow]{len(unresolved)} unresolved[/yellow]  "
+        f"[yellow]{len(unresolved)} moved to Unrecognized[/yellow]  "
         f"[red]{len(errors)} errors[/red]"
     )
 
@@ -297,7 +304,10 @@ def main() -> None:
                         verb = "Would copy" if dry_run else mode.value.capitalize() + "d"
                         console.print(f"[bold green][OK][/bold green] {verb}: [dim]{disp}[/dim]")
                     elif status == "unresolved":
-                        console.print(f"[yellow][SKIP][/yellow] Unresolved: [dim]{disp}[/dim]")
+                        verb = "Would move to" if dry_run else (
+                            "Moved to" if mode == FileMode.MOVE else "Copied to"
+                        )
+                        console.print(f"[yellow][UNRECOGNIZED][/yellow] {verb} Unrecognized: [dim]{disp}[/dim]")
                     else:
                         console.print(f"[bold red][FAIL][/bold red] {disp}")
                 except Exception as exc:

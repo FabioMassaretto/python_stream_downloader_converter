@@ -15,7 +15,6 @@ Parse artist / title hints from common filename patterns:
 import re
 from pathlib import Path
 from typing import Optional
-
 from tools.music_organizer.organizer.models import SongInfo
 
 
@@ -45,9 +44,30 @@ _BRACKET_JUNK = re.compile(
     r"4k|hd|hq|1080p|720p|60fps|dvd|"
     r"remaster|remix|mix|unplugged|tour|concert|stadium|festival|acoustic|session|"
     r"version|explicit|clean|extended|soundtrack|ost|"
-    r"legendado|traduc|sub\s+esp|thai\s+sub|color\s+coded"
+    r"legendado|traduc|sub\s+esp|thai\s+sub|color\s+coded|"
+    r"aula\s+de|videoaula|video\s+aula|guitar\s+lesson|lesson|tutorial|how\s+to\s+play|completa"
     r")[^\)\]\}]*[\)\]\}]"
 )
+
+_LESSON_PATTERNS = re.compile(
+    r"(?i)\b("
+    r"aula\s+de\s+(?:viol[aã]o|guitarra|baixo|bateria|canto|teclado|m[uú]sica)|"
+    r"videoaula|video\s+aula|"
+    r"guitar\s+(?:lesson|class|tutorial|instruction)|"
+    r"bass\s+(?:lesson|class|tutorial)|"
+    r"drum\s+(?:lesson|class|tutorial)|"
+    r"piano\s+(?:lesson|class|tutorial)|"
+    r"how\s+to\s+play\b|"
+    r"guitar\s+tabs?\b|"
+    r"backing\s+track\b|"
+    r"karaoke\b"
+    r")\b"
+)
+
+
+def is_lesson_or_tutorial(text: str) -> bool:
+    """Return True if text contains lesson/tutorial keywords."""
+    return bool(_LESSON_PATTERNS.search(text))
 
 _LIVE_BRACKET = re.compile(
     r"(?i)\s*[\(\[\{][^\)\]\}]*\blive\b[^\)\]\}]*[\)\]\}]"
@@ -116,8 +136,10 @@ def parse_filename(path: Path) -> Optional[SongInfo]:
     # Strip leading track bracket prefixes like [05]
     stem = re.sub(r"^\s*\[\s*\d+\s*\]\s*", "", stem)
 
-    # 1. "Title" de/by Artist  (e.g. "Impatient" de Sascha Ende)
-    m = re.match(r'^(?:")?(.+?)(?:")?\s+(?:de|by)\s+(.+)$', stem, re.IGNORECASE)
+    # 1. "Title" de/by Artist (e.g. "Impatient" de Sascha Ende) - quotes required for 'de'
+    m = re.match(r'^(?:")([^"]+)(?:")\s+(?:de|by)\s+(.+)$', stem, re.IGNORECASE)
+    if not m:
+        m = re.match(r'^(.+?)\s+\((?:cover\s+)?by\s+([^\)]+)\)$', stem, re.IGNORECASE)
     if m:
         t, a = m.group(1), m.group(2)
         ct, ca = clean_title(t), clean_artist(a)

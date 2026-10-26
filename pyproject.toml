@@ -20,6 +20,7 @@ dependencies = [
     "audioop-lts (>=0.2.2,<0.3.0)",
     "savify2 (>=2.3.5)",
     "rich (>=14.2.0,<15.0.0)",
+    "shazamapi (>=0.0.2)",
     "curl-cffi (>=0.16.0,<0.17.0)",
     "savify (>=2.3.4,<3.0.0)"
 ]

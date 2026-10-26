@@ -1,3 +1,4 @@
+from tools.music_organizer.organizer.utils import safe_name
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
@@ -12,8 +13,9 @@ class SongInfo:
     title: Optional[str] = None
     track_number: Optional[int] = None
     year: Optional[str] = None
+    duration: Optional[float] = None
     # Where the info came from
-    source: str = "unknown"  # "tags" | "acoustid" | "musicbrainz" | "filename"
+    source: str = "unknown"  # "tags" | "acoustid" | "musicbrainz" | "filename" | "shazam"
 
     @property
     def is_organizable(self) -> bool:
@@ -25,7 +27,7 @@ class SongInfo:
         Build the target path under *root*:
             root / artist / album (optional) / [NN - ] title.ext
         """
-        from organizer.utils import safe_name
+
 
         parts = [safe_name(self.artist)]
         if self.album:

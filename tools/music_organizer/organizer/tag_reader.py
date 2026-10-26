@@ -2,7 +2,6 @@
 import logging
 from pathlib import Path
 from typing import Optional
-
 from tools.music_organizer.organizer.models import SongInfo
 
 logger = logging.getLogger(__name__)
@@ -39,6 +38,19 @@ def _track_num(raw: Optional[str]) -> Optional[int]:
         return None
 
 
+def get_audio_duration(path: Path) -> Optional[float]:
+    """Return the audio file duration in seconds, or None if unavailable."""
+    if not HAS_MUTAGEN:
+        return None
+    try:
+        audio = MutagenFile(path)
+        if audio and audio.info and hasattr(audio.info, "length"):
+            return float(audio.info.length)
+    except Exception:
+        pass
+    return None
+
+
 def read_tags(path: Path) -> Optional[SongInfo]:
     """
     Return a SongInfo populated from the file's embedded tags,
@@ -70,12 +82,20 @@ def read_tags(path: Path) -> Optional[SongInfo]:
     if not (artist or album or title):
         return None
 
+    dur = None
+    if audio.info and hasattr(audio.info, "length"):
+        try:
+            dur = float(audio.info.length)
+        except Exception:
+            pass
+
     return SongInfo(
         artist=artist,
         album=album,
         title=title,
         track_number=track,
         year=year,
+        duration=dur,
         source="tags",
     )
 

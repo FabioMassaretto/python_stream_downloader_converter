@@ -7,7 +7,6 @@ Python code (i.e. the main downloader app) without going through argparse.
 import concurrent.futures
 import logging
 import os
-import sys
 from pathlib import Path
 from typing import Optional
 
@@ -21,11 +20,15 @@ from rich.progress import (
     TextColumn,
     TimeRemainingColumn,
 )
-
-from tools.music_organizer.organizer.models import SongInfo
 from tools.music_organizer.organizer.utils import safe_display
-from tools.music_organizer.organizer.file_organizer import FileMode, organize_file, resolve_metadata
+from tools.music_organizer.organizer.file_organizer import (
+    FileMode,
+    organize_file,
+    organize_unrecognized_file,
+    resolve_metadata,
+)
 from tools.music_organizer.organizer.scanner import scan
+from tools.music_organizer.organizer.models import SongInfo
 
 logger = logging.getLogger(__name__)
 
@@ -71,7 +74,7 @@ def organize_directory(
         console = Console(highlight=False, emoji=False, legacy_windows=False)
 
     input_dir = Path(input_dir).resolve()
-    output_dir = Path(output_dir).resolve() if output_dir else input_dir / "organized"
+    output_dir = Path(output_dir).resolve() if output_dir else input_dir / "organized" / "library"
     file_mode = FileMode(mode)
     workers = max_workers or os.cpu_count() or 4
 
@@ -281,8 +284,12 @@ def _process_one(
         info = resolve_metadata(src, use_online=use_online)
 
         if not info or not info.is_organizable:
-            console.print(f"[yellow][SKIP][/yellow] Unresolved: {display}")
-            return src, info, None, "unresolved"
+            dest = organize_unrecognized_file(src, output_dir, mode=mode, dry_run=dry_run)
+            verb = "Would move to" if dry_run else (
+                "Moved to" if mode == FileMode.MOVE else "Copied to"
+            )
+            console.print(f"[yellow][UNRECOGNIZED][/yellow] {verb} Unrecognized: {display}")
+            return src, info, dest, "unresolved"
 
         dest = organize_file(src, info, output_dir, mode=mode, dry_run=dry_run)
 
@@ -295,7 +302,7 @@ def _process_one(
         return src, info, dest, "ok"
 
     except Exception as exc:
-        logger.error(f"{src.name}: {exc}")
+        logger.error(f"{safe_display(src.name)}: {exc}")
         console.print(f"[bold red][FAIL][/bold red] {display}: {exc}")
         return src, None, None, "error"
     finally:
