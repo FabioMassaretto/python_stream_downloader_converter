@@ -14,13 +14,14 @@ def main_menu():
             "1) New download\n"
             "2) View progress\n"
             "3) Convert video on queue to audio\n"
+            "4) Organize music library\n"
             "\n"
             "0) Exit",
             title="Main Menu",
             padding=(1, 4)
         )
     )
-    return Prompt.ask("Select option", choices=["1", "2", "3", "0"])
+    return Prompt.ask("Select option", choices=["1", "2", "3", "4", "0"])
 
 
 def provider_menu():
@@ -82,3 +83,45 @@ def confirm_video_to_audio_extract(file_path: Path) -> bool:
         )
     )
     return Prompt.ask("Choose an option", choices=["yes", "y", "no", "n"])
+
+
+def organize_menu():
+    console.print(
+        Panel.fit(
+            "[bold cyan]Music Organizer[/bold cyan]\n\n"
+            "1) Organize converted audio files\n"
+            "2) Organize a custom folder\n"
+            "\n"
+            "0) Back to main menu",
+            title="Organize Music",
+            padding=(1, 4)
+        )
+    )
+    return Prompt.ask("Select option", choices=["1", "2", "0"])
+
+
+def organize_options_menu():
+    console.print(
+        Panel.fit(
+            "1) Move files (relocate to organized folder)\n"
+            "2) Copy files (keep originals)\n"
+            "3) Dry run (preview only)\n"
+            "\n"
+            "0) Back",
+            title="Organize Mode",
+            padding=(1, 4)
+        )
+    )
+    return Prompt.ask("Select mode", choices=["1", "2", "3", "0"])
+
+
+def confirm_organize_after_conversion() -> bool:
+    console.print(
+        Panel.fit(
+            "Do you want to organize the converted audio files now?\n"
+            "(Sort them into Artist/Album/Title folders)",
+            title="Organize converted files",
+            padding=(1, 4)
+        )
+    )
+    return Prompt.ask("Organize?", choices=["yes", "y", "no", "n"]) in ("yes", "y")

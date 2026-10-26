@@ -1,3 +1,4 @@
+import threading
 from pathlib import Path
 from typing import List
 from app.helpers.utils.FileMover import FileMover
@@ -7,6 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 class QueueUtil():
+    _lock = threading.Lock()
     _audio_extract_queue: List[Path] = []
 
     @classmethod
@@ -21,21 +23,24 @@ class QueueUtil():
     
     @staticmethod
     def put_in_queue_list(path: Path) -> None:
-        logger.debug(f"Adding video to audio extract queue list: {path}")
-        logger.debug(f"Current queue before adding: {QueueUtil._audio_extract_queue}")
-        QueueUtil._audio_extract_queue.append(path)
-        logger.debug(f"Updated queue after adding: {QueueUtil._audio_extract_queue}")
+        with QueueUtil._lock:
+            logger.debug(f"Adding video to audio extract queue list: {path}")
+            logger.debug(f"Current queue before adding: {QueueUtil._audio_extract_queue}")
+            if path not in QueueUtil._audio_extract_queue:
+                QueueUtil._audio_extract_queue.append(path)
+            logger.debug(f"Updated queue after adding: {QueueUtil._audio_extract_queue}")
 
     @staticmethod
     def get_queue_list() -> List[Path]:
-        logger.debug(f"Retrieving current audio extract queue list: {QueueUtil._audio_extract_queue}")
-        return QueueUtil._audio_extract_queue
+        with QueueUtil._lock:
+            logger.debug(f"Retrieving current audio extract queue list: {QueueUtil._audio_extract_queue}")
+            return list(QueueUtil._audio_extract_queue)
 
     @staticmethod
     def remove_from_queue_list(path: Path) -> None:
-        logger.debug(f"Removing video from audio extract queue list: {path}")
-        logger.debug(f"Current queue before removing: {QueueUtil._audio_extract_queue}")
-        if path in QueueUtil._audio_extract_queue:
-            QueueUtil._audio_extract_queue.remove(path)
-            logger.debug(f"Updated queue after removing: {QueueUtil._audio_extract_queue}")
-    
+        with QueueUtil._lock:
+            logger.debug(f"Removing video from audio extract queue list: {path}")
+            logger.debug(f"Current queue before removing: {QueueUtil._audio_extract_queue}")
+            if path in QueueUtil._audio_extract_queue:
+                QueueUtil._audio_extract_queue.remove(path)
+                logger.debug(f"Updated queue after removing: {QueueUtil._audio_extract_queue}")
